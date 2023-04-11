@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendAPI", "BackendAPI\Ba
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{D161FE31-037D-4239-BE21-EC2F8FFC46E6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLayer", "DataLayer\DataLayer.csproj", "{FC55E540-9C51-4086-8214-60603C28E267}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{D161FE31-037D-4239-BE21-EC2F8FFC46E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D161FE31-037D-4239-BE21-EC2F8FFC46E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D161FE31-037D-4239-BE21-EC2F8FFC46E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC55E540-9C51-4086-8214-60603C28E267}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC55E540-9C51-4086-8214-60603C28E267}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC55E540-9C51-4086-8214-60603C28E267}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC55E540-9C51-4086-8214-60603C28E267}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

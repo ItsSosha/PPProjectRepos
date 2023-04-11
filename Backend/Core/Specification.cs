@@ -1,6 +1,6 @@
 ﻿namespace Core;
 
-public class Specifications : BaseEntity
+public class Specification : BaseEntity
 {
     public Item Item { get; set; }
     public string Key { get; set; }
