@@ -5,5 +5,5 @@ public class Item : BaseEntity
     public RawItem RawItem { get; set; }
     public IList<Review> Reviews { get; set; }
     public IList<PriceHistory> PriceHistories { get; set; }
-    public IList<Specification> Specifications { get; set; }
+    
 }

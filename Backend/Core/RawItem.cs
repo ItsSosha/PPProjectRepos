@@ -9,4 +9,5 @@ public class RawItem : BaseEntity
     public string RawItemURL { get; set; }
     public RawCategory RawCategory { get; set; }
     public string Description { get; set; }
+    public IList<Specification> Specifications { get; set; }
 }
