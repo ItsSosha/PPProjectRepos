@@ -13,6 +13,10 @@ const Global = createGlobalStyle`
   padding: 0;
   box-sizing: border-box;
 }
+
+html, body, #root {
+  min-height: 100vh;
+}
 `
 
 const router = createBrowserRouter([

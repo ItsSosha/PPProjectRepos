@@ -1,7 +1,23 @@
+import { Container } from "@mui/material";
+import { Outlet } from "react-router-dom";
+import { ThemeProvider } from "@mui/material";
+import defaultTheme from "./utils/theme";
+import Header from "./components/Header";
+import ProductCard from "./components/ProductCard";
+
 function App() {
   return (
-    <div className="App">
-    </div>
+    <ThemeProvider theme={defaultTheme}>
+      <Header />
+      <Container 
+        maxWidth="xl"
+        sx={{
+          minHeight: "100vh",
+        }}>
+        <ProductCard />
+        <Outlet />
+      </Container>
+    </ThemeProvider>
   );
 }
 
