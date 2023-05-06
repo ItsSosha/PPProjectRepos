@@ -21,7 +21,7 @@ const GridItemContainer = styled.div`
   column-gap: 8px;
 `;
 
-const Header = () => {
+const Header = ({ handleSidebarClick }) => {
   return (
     <AppBar
       sx={{
@@ -34,19 +34,19 @@ const Header = () => {
         <Toolbar
           sx={{py: 1}}>
           <Grid container justifyItems="center" alignItems="center">
-            <Grid xs={1}>
+            <Grid item xs={1}>
               <GridItemContainer>
-                <IconButton>
+                <IconButton onClick={handleSidebarClick}>
                   <Menu sx={{ color: "rgba(0, 0, 0, 1)" }} />
                 </IconButton>
               </GridItemContainer>
             </Grid>
-            <Grid xs={2}>
+            <Grid item xs={2}>
               <GridItemContainer>
                 <Logo />
               </GridItemContainer>
             </Grid>
-            <Grid xs={7}>
+            <Grid item xs={7}>
               <GridItemContainer>
                 <TextField
                 variant="outlined"
@@ -63,14 +63,14 @@ const Header = () => {
                 </TextField>
               </GridItemContainer>
             </Grid>
-            <Grid xs={1}>
+            <Grid item xs={1}>
               <GridItemContainer>
                 <IconButton>
                   <Person sx={{ color: "rgba(0, 0, 0, 1)" }} />
                 </IconButton>
               </GridItemContainer>
             </Grid>
-            <Grid xs={1}>
+            <Grid item xs={1}>
               <GridItemContainer>
                 <IconButton>
                   <StarOutlineRounded sx={{ color: "rgba(0, 0, 0, 1)" }} />
