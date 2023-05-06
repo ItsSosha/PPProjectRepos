@@ -18,8 +18,18 @@ const defaultTheme = createTheme({
         }
     },
     typography: {
+        fontFamily: "Inter",
+        price: {
+            fontFamily: "Manrope",
+            fontSize: 20,
+            fontWeight: 500
+        },
+        caption: {
+            fontSize: 16,
+            fontWeight: 500
+        },
         h1: {
-            fontFamily: 'Raleway',
+            fontFamily: "Manrope",
             fontSize: 24,
             fontWeight: 600
         }
