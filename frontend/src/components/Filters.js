@@ -1,0 +1,71 @@
+import {
+  Box,
+  TextField,
+  Typography,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+} from "@mui/material";
+
+const Filters = ({ props }) => {
+
+  const vendors = ["Rozetka", "Citrus"];
+
+  return (
+    <Box
+      maxWidth="260px"
+      py={4}
+      px={2}
+      boxShadow="0 4px 24px rgba(123, 123, 123, 0.35)"
+      borderRadius="5px"
+    >
+      <form>
+        <Typography variant="h6" mb={2}>
+          Ціна, &#8372;
+        </Typography>
+        <Typography variant="body1" mb={1}>
+          Від
+        </Typography>
+        <TextField
+          mb={1}
+          variant="outlined"
+          label="Введіть початкову ціну"
+          size="small"
+          color="secondary"
+          sx={{
+            mb: "0.5em"
+          }}
+        >
+        </TextField>
+        <Typography variant="body1" mb={1}>
+          До
+        </Typography>
+        <TextField
+          mb={1}
+          variant="outlined"
+          label="Введіть кінцеву ціну"
+          size="small"
+          color="secondary"
+          sx={{
+            mb: "0.5em"
+          }}
+        >
+        </TextField>
+        <Typography variant="h6" mb={0} mt={1}>
+          Акційні товари
+        </Typography>
+        <FormControlLabel control={<Checkbox color="secondary" />} label="Тільки акційні товари" />
+        <Typography variant="h6" mb={0} mt={1}>
+          Продавець
+        </Typography>
+        <FormGroup>
+        {vendors.map((vendor) => (
+          <FormControlLabel key={"checkbox" + vendor} control={<Checkbox color="secondary" />} label={vendor} />
+        ))}
+        </FormGroup>
+      </form>
+    </Box>
+  )
+};
+
+export default Filters;
