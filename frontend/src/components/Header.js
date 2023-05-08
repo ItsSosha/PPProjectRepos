@@ -3,7 +3,6 @@ import styled from "styled-components";
 import {
   AppBar,
   Toolbar,
-  Typography,
   IconButton,
   Container,
   Grid,
