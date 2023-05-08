@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom";
 import { ThemeProvider } from "@mui/material";
 import defaultTheme from "./utils/theme";
 import Header from "./components/Header";
-import ProductCard from "./components/ProductsList/ProductCard";
+import Footer from "./components/Footer";
 import Sidebar from "./components/Sidebar/Sidebar";
 import { useState } from "react";
 
@@ -18,12 +18,14 @@ function App() {
         setSidebarOpen={setSidebarOpen}
       />
       <Container 
+        component={"main"}
         maxWidth="xl"
         sx={{
           minHeight: "100vh",
         }}>
         <Outlet />
       </Container>
+      <Footer />
     </ThemeProvider>
   );
 }
