@@ -5,6 +5,9 @@ import {
   createBrowserRouter,
   RouterProvider
 } from 'react-router-dom';
+import { 
+  Home
+ } from './pages';
 import App from './App';
 
 const Global = createGlobalStyle`
@@ -24,7 +27,10 @@ const router = createBrowserRouter([
     path: "/",
     element: <App />,
     children: [
-
+      {
+        index: true,
+        element: <Home />
+      }
     ]
   }
 ])
