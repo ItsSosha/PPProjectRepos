@@ -5,11 +5,11 @@ import {
   Typography,
   CardActionArea } from "@mui/material"
 
-const ProductCard = () => {
+const ProductCard = ({data}) => {
   return (
     <Card 
       sx={{
-        maxWidth: "255px",
+        width: "255px",
         boxShadow: '0 4px 24px rgba(123, 123, 123, 0.15)'}}>
       <CardActionArea
         component="a">
@@ -17,23 +17,31 @@ const ProductCard = () => {
           component="img"
           height="154"
           sx={{
-            objectFit: "contain"
+            objectFit: "contain",
+            padding: "1em"
           }}
-          image="https://tekhnolog.com/wp-content/uploads/2017/12/Bez-nazvaniya-1-374.jpg"
+          image={data.RawIconURL}
           alt="lalat satuk">
         </CardMedia>
         <CardContent>
           <Typography
             variant="caption"
-            component="p">
-              Назва продукту
+            component="p"
+            sx={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitLineClamp: '3',
+              WebkitBoxOrient: 'vertical'
+            }}>
+            {data.Name}
           </Typography>
           <Typography
             variant="price"
             component="p"
             color="secondary"
             align="right">
-            8.99$
+            {data.RawPrice}₴&nbsp;{data.IsOnSale ? <Typography sx={{textDecoration: "line-through", display: "inline"}}>{data.OldPrice}₴</Typography> : null }
           </Typography>
         </CardContent>
       </CardActionArea>
@@ -42,3 +50,5 @@ const ProductCard = () => {
 }
 
 export default ProductCard;
+
+// https://tekhnolog.com/wp-content/uploads/2017/12/Bez-nazvaniya-1-374.jpg
