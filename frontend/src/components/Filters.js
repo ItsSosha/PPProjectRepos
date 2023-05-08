@@ -5,7 +5,10 @@ import {
   Checkbox,
   FormControlLabel,
   FormGroup,
+  Button
 } from "@mui/material";
+
+import { Refresh } from "@mui/icons-material";
 
 const Filters = ({ props }) => {
 
@@ -63,6 +66,30 @@ const Filters = ({ props }) => {
           <FormControlLabel key={"checkbox" + vendor} control={<Checkbox color="secondary" />} label={vendor} />
         ))}
         </FormGroup>
+        <Box 
+          display="flex"
+          justifyContent="space-between"
+          mt={2}
+        > 
+          <Button 
+            type="submit" 
+            variant="contained" 
+            color="secondary"
+            sx={{
+              color: "#FFF",
+              paddingX: "2em"
+            }}
+          >
+            Шукати
+          </Button>
+          <Button 
+            type="reset" 
+            variant="outlined" 
+            color="secondary"
+          >
+            <Refresh />
+          </Button>
+        </Box>
       </form>
     </Box>
   )
