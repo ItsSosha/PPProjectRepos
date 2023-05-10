@@ -10,7 +10,7 @@ const SpecificationsList = ({specs}) => {
     return (
         <SpecificationsWrapper>
             {specs.map(spec => {
-                return <Specification spec={spec}/>
+                return <Specification spec={spec} key={spec.Key}/>
             })}
         </SpecificationsWrapper>
 
