@@ -6,6 +6,7 @@ import { useParams, Outlet, NavLink } from "react-router-dom";
 import styled from "styled-components";
 import ProductCardLg from "../components/ProductCardLg";
 import { useState } from "react";
+import ProductList from "../components/ProductsList/ProductList"
 
 const dummyData = [
   {
@@ -29,14 +30,14 @@ const dummyData = [
       {
         Key: 'Тип экрана',
         Value: 'IPS'
-      }
+      },
     ]
   },
   {
     Id: 1,
     Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
     RawIconURL:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/ROZETKA-Logo-L3-B-RGB.png/1200px-ROZETKA-Logo-L3-B-RGB.png",
+      "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
     RawPrice: 35999,
     OldPrice: 0,
     IsOnSale: false,
@@ -90,6 +91,7 @@ const ProductContent = styled.div`
 
 const CardSection = styled.div`
   padding: 20px;
+  align-self: center;
 `;
 
 const ButtonNavLink = ({to, text}) => {
@@ -128,10 +130,7 @@ const Product = () => {
     <ProductWrapper>
       <Typography
           variant="h5"
-          component="h5"
-          sx={{
-            width: '100%'
-          }}>
+          component="h5">
           {product.Name}
       </Typography>
       <ButtonsWrapper>
@@ -144,6 +143,16 @@ const Product = () => {
           <ProductCardLg product={product} onFavouriteChange={handleFavouriteChange}/>
         </CardSection>
       </ProductContent>
+      <Typography
+          variant="h5"
+          component="h5"
+          sx={{
+            mt: 3,
+            mb: 1
+          }}>
+          Рекомендовані товари
+      </Typography>
+      <ProductList itemsPerRow={5} data={dummyData}/>
     </ProductWrapper>
   );
 };

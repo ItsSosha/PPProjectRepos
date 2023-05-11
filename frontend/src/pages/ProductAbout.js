@@ -1,11 +1,14 @@
 import { useOutletContext } from "react-router-dom";
 import styled from "styled-components";
-import { Typography } from "@mui/material";
+import { Typography, Paper, Link } from "@mui/material";
 import SpecificationsList from "../components/SpecificationsList/SpecificationsList";
 
 const AboutWrapper = styled.div`
 padding: 20px;
+display: flex;
+flex-direction: column;
 `
+
 
 
 const ProductAbout = () => {
@@ -31,6 +34,22 @@ const ProductAbout = () => {
         }}>
         Динаміка цін
       </Typography>
+      <Paper
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flex: "1 0 30em",
+          backgroundColor: "secondary.main"
+        }}>
+          <Typography 
+            variant="h4"
+            component="h4"
+            color="primary"
+            align="center">
+          Для доступу до динаміки цін необхідно <Link href="#">оформити підписку</Link>
+          </Typography>
+      </Paper>
     </AboutWrapper>
   )
 }
