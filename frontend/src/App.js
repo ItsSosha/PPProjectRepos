@@ -22,7 +22,9 @@ function App() {
         maxWidth="xl"
         sx={{
           minHeight: "100vh",
-          my: '48px'
+          my: '48px',
+          display: 'flex',
+          flexDirection: 'column'
         }}>
         <Outlet />
       </Container>

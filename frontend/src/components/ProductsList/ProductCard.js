@@ -4,6 +4,7 @@ import {
   CardContent,
   Typography,
   CardActionArea } from "@mui/material"
+  import { Link } from "react-router-dom";
 
 const ProductCard = ({data}) => {
   return (
@@ -12,7 +13,8 @@ const ProductCard = ({data}) => {
         width: "255px",
         boxShadow: '0 4px 24px rgba(123, 123, 123, 0.15)'}}>
       <CardActionArea
-        component="a">
+        component={Link}
+        to={`/products/${data.Id}/about`}>
         <CardMedia
           component="img"
           height="154"
@@ -21,7 +23,7 @@ const ProductCard = ({data}) => {
             padding: "1em"
           }}
           image={data.RawIconURL}
-          alt="lalat satuk">
+          alt={data.Name}>
         </CardMedia>
         <CardContent>
           <Typography
@@ -41,7 +43,7 @@ const ProductCard = ({data}) => {
             component="p"
             color="secondary"
             align="right">
-            {data.RawPrice}₴&nbsp;{data.IsOnSale ? <Typography sx={{textDecoration: "line-through", display: "inline"}}>{data.OldPrice}₴</Typography> : null }
+            {data.RawPrice}₴&nbsp;{data.IsOnSale ? <Typography sx={{textDecoration: "line-through"}} component="span">{data.OldPrice}₴</Typography> : null }
           </Typography>
         </CardContent>
       </CardActionArea>
@@ -50,5 +52,3 @@ const ProductCard = ({data}) => {
 }
 
 export default ProductCard;
-
-// https://tekhnolog.com/wp-content/uploads/2017/12/Bez-nazvaniya-1-374.jpg

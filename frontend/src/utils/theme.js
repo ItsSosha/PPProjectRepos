@@ -15,6 +15,9 @@ const defaultTheme = createTheme({
         },
         secondary: {
             main: "#56B280"
+        },
+        disabled: {
+            main: "#9A9CA5"
         }
     },
     typography: {

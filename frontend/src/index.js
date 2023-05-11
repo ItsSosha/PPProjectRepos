@@ -6,7 +6,10 @@ import {
   RouterProvider
 } from 'react-router-dom';
 import { 
-  Home
+  Home,
+  Product,
+  ProductAbout,
+  ProductReviews
  } from './pages';
 import App from './App';
 
@@ -30,6 +33,20 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <Home />
+      },
+      {
+        path: "products/:id",
+        element: <Product />,
+        children: [
+          {
+            path: "about",
+            element: <ProductAbout />
+          },
+          {
+            path: "reviews",
+            element: <ProductReviews />
+          }
+        ]
       }
     ]
   }

@@ -3,6 +3,7 @@ import ProductList from "../components/ProductsList/ProductList";
 
 const dummyData = [
   {
+    Id: 0,
     Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
     RawIconURL: "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
     RawPrice: 35999,
@@ -10,6 +11,7 @@ const dummyData = [
     IsOnSale: true
   },
   {
+    Id: 1,
     Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
     RawIconURL: "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
     RawPrice: 35999,
@@ -17,6 +19,7 @@ const dummyData = [
     IsOnSale: false
   },
   {
+    Id: 2,
     Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
     RawIconURL: "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
     RawPrice: 35999,
@@ -24,6 +27,7 @@ const dummyData = [
     IsOnSale: false
   },
   {
+    Id: 3,
     Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
     RawIconURL: "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
     RawPrice: 35999,
@@ -31,6 +35,7 @@ const dummyData = [
     IsOnSale: false
   },
   {
+    Id: 4,
     Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
     RawIconURL: "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
     RawPrice: 35999,
