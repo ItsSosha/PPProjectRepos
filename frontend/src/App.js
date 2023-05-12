@@ -1,7 +1,5 @@
 import { Container } from "@mui/material";
 import { Outlet } from "react-router-dom";
-import { ThemeProvider } from "@mui/material";
-import defaultTheme from "./utils/theme";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Sidebar from "./components/Sidebar/Sidebar";
@@ -11,7 +9,7 @@ function App() {
   const [ isSidebarOpen, setSidebarOpen ] = useState(false);
 
   return (
-    <ThemeProvider theme={defaultTheme}>
+    <>
       <Header handleSidebarClick={() => setSidebarOpen(true)} />
       <Sidebar
         isSidebarOpen={isSidebarOpen}
@@ -29,7 +27,7 @@ function App() {
         <Outlet />
       </Container>
       <Footer />
-    </ThemeProvider>
+    </>
   );
 }
 

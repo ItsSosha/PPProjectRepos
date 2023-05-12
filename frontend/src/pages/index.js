@@ -3,6 +3,7 @@ import Product from "./Product";
 import ProductAbout from "./ProductAbout";
 import ProductReviews from "./ProductReviews";
 import SearchResults from "./SearchResults";
+import NotFound from "./404";
 
 export {
   Home,
@@ -10,4 +11,5 @@ export {
   ProductAbout,
   ProductReviews,
   SearchResults,
+  NotFound
 };
