@@ -9,7 +9,10 @@ import {
   Home,
   Product,
   ProductAbout,
-  ProductReviews
+  ProductReviews,
+  User,
+  UserAbout,
+  UserWishlist
  } from './pages';
 import App from './App';
 
@@ -45,6 +48,20 @@ const router = createBrowserRouter([
           {
             path: "reviews",
             element: <ProductReviews />
+          }
+        ]
+      },
+      {
+        path: "users/:id",
+        element: <User />,
+        children: [
+          {
+            path: "about",
+            element: <UserAbout />
+          },
+          {
+            path: "wishlist",
+            element: <UserWishlist />
           }
         ]
       }
