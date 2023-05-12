@@ -21,6 +21,7 @@ const Filters = ({ props }) => {
       px={2}
       boxShadow="0 4px 24px rgba(123, 123, 123, 0.35)"
       borderRadius="5px"
+      alignSelf="start"
     >
       <form>
         <Typography variant="h6" mb={2}>

@@ -5,12 +5,16 @@ import ProductReviews from "./ProductReviews";
 import User from "./User";
 import UserAbout from "./UserAbout";
 import UserWishlist from "./UserWishlist";
+import SearchResults from "./SearchResults";
+import NotFound from "./404";
 
 export {
   Home,
   Product,
   ProductAbout,
   ProductReviews,
+  SearchResults,
+  NotFound,
   User,
   UserAbout,
   UserWishlist

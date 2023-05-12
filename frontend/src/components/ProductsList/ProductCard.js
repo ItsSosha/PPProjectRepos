@@ -10,15 +10,15 @@ const ProductCard = ({data}) => {
   return (
     <Card 
       sx={{
-        width: "255px",
+        maxWidth: "255px",
         boxShadow: '0 4px 24px rgba(123, 123, 123, 0.15)'}}>
       <CardActionArea
         component={Link}
         to={`/products/${data.Id}/about`}>
         <CardMedia
           component="img"
-          height="154"
           sx={{
+            maxHeight: "154px",
             objectFit: "contain",
             padding: "1em"
           }}

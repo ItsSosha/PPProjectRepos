@@ -5,11 +5,15 @@ import {
   createBrowserRouter,
   RouterProvider
 } from 'react-router-dom';
+import { ThemeProvider } from '@mui/material';
+import defaultTheme from './utils/theme';
 import { 
   Home,
   Product,
   ProductAbout,
   ProductReviews,
+  SearchResults,
+  NotFound,
   User,
   UserAbout,
   UserWishlist
@@ -32,6 +36,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+    errorElement: <NotFound />,
     children: [
       {
         index: true,
@@ -64,6 +69,10 @@ const router = createBrowserRouter([
             element: <UserWishlist />
           }
         ]
+      },
+      {
+        path: "search",
+        element: <SearchResults />
       }
     ]
   }
@@ -72,7 +81,9 @@ const router = createBrowserRouter([
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <Global />
-    <RouterProvider router={router} />
+    <ThemeProvider theme={defaultTheme}>
+      <Global />
+      <RouterProvider router={router} />
+    </ThemeProvider>
   </React.StrictMode>
 );

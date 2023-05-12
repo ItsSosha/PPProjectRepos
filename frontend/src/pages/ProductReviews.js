@@ -9,7 +9,6 @@ import {
   Grid,
   Typography,
   Pagination,
-  Box,
   Stack
 } from "@mui/material";
 
