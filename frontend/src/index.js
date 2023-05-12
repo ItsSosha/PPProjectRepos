@@ -9,7 +9,8 @@ import {
   Home,
   Product,
   ProductAbout,
-  ProductReviews
+  ProductReviews,
+  SearchResults,
  } from './pages';
 import App from './App';
 
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
             element: <ProductReviews />
           }
         ]
+      },
+      {
+        path: "search",
+        element: <SearchResults />
       }
     ]
   }
