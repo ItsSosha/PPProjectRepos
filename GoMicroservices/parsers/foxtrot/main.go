@@ -2,17 +2,21 @@ package main //package foxtrot
 
 import (
 	"GoMicroservices/CoreStructs"
+	"GoMicroservices/genericDb"
 	"fmt"
 	"github.com/gocolly/colly/v2"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 	"log"
 	"strconv"
 	"strings"
 	"time"
 )
 
-const PARALLEL = 1
-const RANDOM_DELAY = 20 // c
-const MIN_DELAY = 5000  // mlc
+const PARALLEL = 2
+const RANDOM_DELAY = 3 // c
+const MIN_DELAY = 600  // mlc
+const ASYNC = false
 
 type AddSpecification func(specification CoreStructs.Specification)
 type AddItem func(specification CoreStructs.RawItem)
@@ -55,7 +59,7 @@ func parseSpecsForItem(itemId int64, addSpecificationFunc AddSpecification, spec
 
 func parseItem(store CoreStructs.Store, addItemFunc AddItem, addSpecificationFunc AddSpecification) *colly.Collector {
 	itemsCollector := colly.NewCollector(
-		colly.Async(true),
+		colly.Async(ASYNC),
 	)
 
 	itemsCollector.OnHTML("div.page", func(itemPage *colly.HTMLElement) {
@@ -122,7 +126,7 @@ func parseItem(store CoreStructs.Store, addItemFunc AddItem, addSpecificationFun
 
 func parseCategory(store CoreStructs.Store, addCategoryFunc AddCategory, itemsCollector *colly.Collector) *colly.Collector {
 	categoriesCollector := colly.NewCollector(
-		colly.Async(true),
+		colly.Async(ASYNC),
 	)
 
 	categoriesCollector.OnHTML("div.page", func(categoryPage *colly.HTMLElement) {
@@ -133,7 +137,6 @@ func parseCategory(store CoreStructs.Store, addCategoryFunc AddCategory, itemsCo
 			Id:             id,
 			ParsedName:     pageHeader,
 			StoreId:        store.Id,
-			CategoryId:     -1,
 			RawCategoryURL: categoryPage.Request.URL.String(),
 		}
 
@@ -160,7 +163,7 @@ func parseCategory(store CoreStructs.Store, addCategoryFunc AddCategory, itemsCo
 
 func parseHomePage(store CoreStructs.Store, categoriesCollector *colly.Collector) *colly.Collector {
 	homePageCollector := colly.NewCollector(
-		colly.Async(true),
+		colly.Async(ASYNC),
 	)
 
 	homePageCollector.OnHTML("a.catalog-sub__title_link", func(categoryElement *colly.HTMLElement) {
@@ -182,40 +185,73 @@ func parseHomePage(store CoreStructs.Store, categoriesCollector *colly.Collector
 }
 
 func main() {
+	db := sqlx.MustConnect("postgres", "postgres://doadmin:AVNS_y5YBzYRh_TXY10W9cwL@db-postgresql-fra1-48384-do-user-11887088-0.b.db.ondigitalocean.com:25060/StoreDb")
+	defer db.Close()
+	db.SetMaxOpenConns(10)
+	db.SetMaxIdleConns(4)
+
 	store := CoreStructs.Store{
 		Id:      1,
 		Name:    "Foxtrot",
 		URL:     "https://foxtrot.com.ua",
-		IconURL: "",
+		IconURL: "https://foxtrotgroup.com.ua/brand.aspx?id=2",
 	}
 
-	var specificationStorage []CoreStructs.Specification
-	var categoryStorage []CoreStructs.RawCategory
-	var itemStorage []CoreStructs.RawItem
+	err := genericDb.Insert(db, CoreStructs.StoreInsertQuery, store)
+	if err != nil {
+		log.Fatalln(err)
+		panic("Error in adding Store to DB")
+	}
+
+	//var specificationStorage []CoreStructs.Specification
+	//var categoryStorage []CoreStructs.RawCategory
+	//var itemStorage []CoreStructs.RawItem
+	//
+	//var addSpecification AddSpecification = func(spec CoreStructs.Specification) {
+	//	specificationStorage = append(specificationStorage, spec)
+	//}
+	//var addCategory AddCategory = func(category CoreStructs.RawCategory) {
+	//	categoryStorage = append(categoryStorage, category)
+	//}
+	//var addItem AddItem = func(item CoreStructs.RawItem) {
+	//	itemStorage = append(itemStorage, item)
+	//}
 
 	var addSpecification AddSpecification = func(spec CoreStructs.Specification) {
-		specificationStorage = append(specificationStorage, spec)
+		err := genericDb.Insert(db, CoreStructs.SpecInsertQuery, spec)
+		if err != nil {
+			log.Println("Error in adding spec to db")
+			log.Println(err)
+		}
 	}
 	var addCategory AddCategory = func(category CoreStructs.RawCategory) {
-		categoryStorage = append(categoryStorage, category)
+		err := genericDb.Insert(db, CoreStructs.CategoryInsertQuery, category)
+		if err != nil {
+			log.Println("Error in adding category to db")
+			log.Println(err)
+		}
 	}
 	var addItem AddItem = func(item CoreStructs.RawItem) {
-		itemStorage = append(itemStorage, item)
+		err := genericDb.Insert(db, CoreStructs.ItemInsertQuery, item)
+		if err != nil {
+			log.Println("Error in adding item to db")
+			log.Println(err)
+		}
 	}
 
 	itemCollector := parseItem(store, addItem, addSpecification)
 	categoryCollector := parseCategory(store, addCategory, itemCollector)
 	homePageCollector := parseHomePage(store, categoryCollector)
 
-	err := homePageCollector.Visit("https://foxtrot.com.ua/ua")
-	if err != nil {
+	homePageErr := homePageCollector.Visit("https://foxtrot.com.ua/ua")
+	if homePageErr != nil {
 		fmt.Println("Error in visiting main page")
 	}
 
 	homePageCollector.Wait()
 	categoryCollector.Wait()
 	itemCollector.Wait()
-	fmt.Println(len(categoryStorage))
-	fmt.Println(len(itemStorage))
-	fmt.Println(len(specificationStorage))
+	//fmt.Println(len(categoryStorage))
+	//fmt.Println(len(itemStorage))
+	//fmt.Println(len(specificationStorage))
 }
