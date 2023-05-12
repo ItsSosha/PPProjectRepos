@@ -7,6 +7,7 @@ import (
 	"github.com/gocolly/colly/v2"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"hash/crc32"
 	"log"
 	"strconv"
 	"strings"
@@ -30,6 +31,18 @@ func getId(storeId int64, rawId string) int64 {
 	}
 
 	return id
+}
+
+func getCategoryId(storeId int64, rawId string) int64 {
+	rawUIntId := crc32.ChecksumIEEE([]byte(rawId))
+	var rawIntId int64
+	if rawUIntId < 0 {
+		rawIntId = -1 * int64(rawUIntId)
+	} else {
+		rawIntId = int64(rawUIntId)
+	}
+
+	return getId(storeId, strconv.Itoa(int(rawIntId)))
 }
 
 func parseSpecsForItem(itemId int64, addSpecificationFunc AddSpecification, specs *colly.HTMLElement) {
@@ -92,7 +105,14 @@ func parseItem(store CoreStructs.Store, addItemFunc AddItem, addSpecificationFun
 			})
 		})
 
-		categoryId := getId(store.Id, itemPage.ChildAttr("li.category-id-container", "data-category"))
+		var categoryString string
+		itemPage.ForEach("li.category-id-container", func(i int, categoryLink *colly.HTMLElement) {
+			categoryString = categoryLink.ChildAttr("a", "href")
+		})
+		if categoryString == "" {
+			log.Fatalln("Err in finding category")
+		}
+		categoryId := getCategoryId(store.Id, categoryString)
 
 		item := CoreStructs.RawItem{
 			Id:            id,
@@ -130,7 +150,7 @@ func parseCategory(store CoreStructs.Store, addCategoryFunc AddCategory, itemsCo
 	)
 
 	categoriesCollector.OnHTML("div.page", func(categoryPage *colly.HTMLElement) {
-		id := getId(store.Id, categoryPage.ChildAttr("li.category-id-container", "data-category"))
+		id := getCategoryId(store.Id, categoryPage.Request.URL.String())
 		pageHeader := categoryPage.ChildText("h1.with-counter")
 
 		category := CoreStructs.RawCategory{
@@ -140,16 +160,18 @@ func parseCategory(store CoreStructs.Store, addCategoryFunc AddCategory, itemsCo
 			RawCategoryURL: categoryPage.Request.URL.String(),
 		}
 
-		addCategoryFunc(category)
+		if category.ParsedName != "" {
+			addCategoryFunc(category)
 
-		categoryPage.ForEach("a.card__title[href]", func(i int, productCardTitle *colly.HTMLElement) {
-			link := productCardTitle.Attr("href")
+			categoryPage.ForEach("a.card__title[href]", func(i int, productCardTitle *colly.HTMLElement) {
+				link := productCardTitle.Attr("href")
 
-			err := itemsCollector.Visit(store.URL + link)
-			if err != nil {
-				log.Println("Error in parsing item card element on category page!")
-			}
-		})
+				err := itemsCollector.Visit(store.URL + link)
+				if err != nil {
+					log.Println("Error in parsing item card element on category page!")
+				}
+			})
+		}
 	})
 
 	categoriesCollector.Limit(&colly.LimitRule{
@@ -166,8 +188,8 @@ func parseHomePage(store CoreStructs.Store, categoriesCollector *colly.Collector
 		colly.Async(ASYNC),
 	)
 
-	homePageCollector.OnHTML("a.catalog-sub__title_link", func(categoryElement *colly.HTMLElement) {
-		link := categoryElement.Attr("href")
+	homePageCollector.OnHTML("div.subcategory__name", func(categoryElement *colly.HTMLElement) {
+		link := categoryElement.ChildAttr("a", "href")
 
 		err := categoriesCollector.Visit(store.URL + link)
 		if err != nil {
@@ -200,7 +222,6 @@ func main() {
 	err := genericDb.Insert(db, CoreStructs.StoreInsertQuery, store)
 	if err != nil {
 		log.Fatalln(err)
-		panic("Error in adding Store to DB")
 	}
 
 	//var specificationStorage []CoreStructs.Specification
@@ -243,7 +264,7 @@ func main() {
 	categoryCollector := parseCategory(store, addCategory, itemCollector)
 	homePageCollector := parseHomePage(store, categoryCollector)
 
-	homePageErr := homePageCollector.Visit("https://foxtrot.com.ua/ua")
+	homePageErr := homePageCollector.Visit("https://foxtrot.com.ua/uk/home/allcategories")
 	if homePageErr != nil {
 		fmt.Println("Error in visiting main page")
 	}
