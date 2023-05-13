@@ -88,7 +88,7 @@ func parseItem(store CoreStructs.Store, addItemFunc AddItem, addSpecificationFun
 		isOnSale := false
 		itemPage.ForEach("div.product-box__main_discount", func(index int, discountElement *colly.HTMLElement) {
 			rawOldPrice := discountElement.ChildText("label")
-			if pr, err := strconv.ParseFloat(rawOldPrice, 64); err == nil {
+			if pr, err := strconv.ParseFloat(strings.ReplaceAll(rawOldPrice, " ", ""), 64); err == nil {
 				oldPrice = pr
 				isOnSale = true
 			}
@@ -253,7 +253,7 @@ func main() {
 		}
 	}
 	var addItem AddItem = func(item CoreStructs.RawItem) {
-		err := genericDb.Insert(db, CoreStructs.ItemInsertQuery, item)
+		err := genericDb.Insert(db, CoreStructs.RawItemInsertQuery, item)
 		if err != nil {
 			log.Println("Error in adding item to db")
 			log.Println(err)

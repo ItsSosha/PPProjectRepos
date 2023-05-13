@@ -1,6 +1,7 @@
 package CoreStructs
 
-const ItemInsertQuery = "INSERT INTO \"RawItems\" " +
+const RawItemTableName = "\"RawItems\""
+const RawItemInsertQuery = "INSERT INTO " + RawItemTableName + " " +
 	"(\"Id\", \"Name\", \"RawPrice\", \"OldPrice\", \"IsOnSale\", \"RawItemURL\", \"RawCategoryId\", \"Description\", \"RawIconURL\") VALUES " +
 	"(:Id, :Name, :RawPrice, :OldPrice, :IsOnSale, :RawItemURL, :RawCategoryId, :Description, :RawIconURL)"
 
