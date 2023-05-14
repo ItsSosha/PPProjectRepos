@@ -17,6 +17,7 @@ import {
   User,
   UserAbout,
   UserWishlist,
+  SharedWishlist,
   AdminApproved,
   AdminUnapproved
  } from './pages';
@@ -91,6 +92,10 @@ const router = createBrowserRouter([
         path: "search",
         element: <SearchResults />
       },
+      {
+        path: "sharedwishlist/:id",
+        element: <SharedWishlist />
+      }
     ]
   }
 ])

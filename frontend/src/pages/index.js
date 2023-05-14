@@ -7,6 +7,7 @@ import UserAbout from "./UserAbout";
 import UserWishlist from "./UserWishlist";
 import SearchResults from "./SearchResults";
 import NotFound from "./404";
+import SharedWishlist from "./SharedWishlist";
 import AdminApproved from "./AdminApproved";
 import AdminUnapproved from "./AdminUnapproved";
 
@@ -20,6 +21,7 @@ export {
   User,
   UserAbout,
   UserWishlist,
+  SharedWishlist,
   AdminApproved,
   AdminUnapproved
 };

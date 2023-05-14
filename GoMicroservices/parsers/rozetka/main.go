@@ -1,4 +1,4 @@
-package main //package foxtrot
+package main //package rozetka
 
 import (
 	"GoMicroservices/CoreStructs"
@@ -45,29 +45,24 @@ func getCategoryId(storeId int64, rawId string) int64 {
 	return getId(storeId, strconv.Itoa(int(rawIntId)))
 }
 
-func parseSpecsForItem(itemId int64, addSpecificationFunc AddSpecification, specs *colly.HTMLElement) {
-	specs.ForEach("div.main-details__item", func(i int, spec *colly.HTMLElement) {
-		var key string
-		var value string
+func parseSpecsForItem(itemId int64, addSpecificationFunc AddSpecification, spec *colly.HTMLElement) {
+	var value string
 
-		spec.ForEach("div.main-details__item_name", func(i int, keyElement *colly.HTMLElement) {
-			key += strings.Trim(keyElement.ChildText("span"), " ")
+	key := spec.ChildText("dt.characteristics-full__label")
+
+	spec.ForEach("dd.characteristics-full__value", func(i int, valueElements *colly.HTMLElement) {
+		valueElements.ForEach("li", func(i int, valueElement *colly.HTMLElement) {
+			value += valueElement.Text + " "
 		})
-
-		spec.ForEach("div.main-details__item_value", func(i int, valueElements *colly.HTMLElement) {
-			valueElements.ForEach("a.prop-value", func(i int, valueElement *colly.HTMLElement) {
-				value += valueElement.Text + " "
-			})
-		})
-		value = strings.Trim(value, " ")
-
-		specification := CoreStructs.Specification{
-			RawItemId: itemId,
-			Key:       key,
-			Value:     value,
-		}
-		addSpecificationFunc(specification)
 	})
+	value = strings.Trim(value, " ")
+
+	specification := CoreStructs.Specification{
+		RawItemId: itemId,
+		Key:       key,
+		Value:     value,
+	}
+	addSpecificationFunc(specification)
 }
 
 func parseItem(store CoreStructs.Store, addItemFunc AddItem, addSpecificationFunc AddSpecification) *colly.Collector {
@@ -75,44 +70,46 @@ func parseItem(store CoreStructs.Store, addItemFunc AddItem, addSpecificationFun
 		colly.Async(ASYNC),
 	)
 
-	itemsCollector.OnHTML("div.page", func(itemPage *colly.HTMLElement) {
-		id := getId(store.Id, itemPage.ChildAttr("div.product-box__content", "data-code"))
-		name := itemPage.ChildAttr("div.product-box__content", "data-title")
+	itemsCollector.OnHTML("app-root", func(itemPage *colly.HTMLElement) {
+		id := getCategoryId(store.Id, itemPage.Request.URL.String())
+		name := itemPage.ChildText("h1.product__title")
 
 		var price float64
-		if pr, err := strconv.ParseFloat(itemPage.ChildAttr("div.product-box__content", "data-price"), 64); err == nil {
+		if pr, err := strconv.ParseFloat(strings.ReplaceAll(strings.Trim(itemPage.ChildText("p.product-price__big"), "₴"), " ", ""), 64); err == nil {
 			price = pr
 		}
 
 		var oldPrice float64
 		isOnSale := false
-		itemPage.ForEach("div.product-box__main_discount", func(index int, discountElement *colly.HTMLElement) {
-			rawOldPrice := discountElement.ChildText("label")
-			if pr, err := strconv.ParseFloat(strings.ReplaceAll(rawOldPrice, " ", ""), 64); err == nil {
-				oldPrice = pr
-				isOnSale = true
-			}
-		})
+		oldPriceString := strings.ReplaceAll(strings.Trim(itemPage.ChildText("p.product-price__small"), "₴"), " ", "")
+		if pr, err := strconv.ParseFloat(oldPriceString, 64); err == nil {
+			oldPrice = pr
+			isOnSale = true
+		}
 
 		var pictureLink string
-		itemPage.ForEach("div.product-img__carousel", func(i int, imageList *colly.HTMLElement) {
-			imageList.ForEachWithBreak("img", func(i int, image *colly.HTMLElement) bool {
-				if i > 0 {
-					return false
-				}
-				pictureLink = image.Attr("src")
-				return true
-			})
+		itemPage.ForEachWithBreak("img.picture-container__picture", func(i int, image *colly.HTMLElement) bool {
+			if i > 0 {
+				return false
+			}
+			pictureLink = image.Attr("src")
+			return true
 		})
 
 		var categoryString string
-		itemPage.ForEach("li.category-id-container", func(i int, categoryLink *colly.HTMLElement) {
-			categoryString = categoryLink.ChildAttr("a", "href")
+		itemPage.ForEachWithBreak("a.breadcrumbs__link", func(i int, categoryLink *colly.HTMLElement) bool {
+			if i != 1 {
+				return true
+			}
+			categoryString = categoryLink.Attr("href")
+			return false
 		})
 		if categoryString == "" {
 			log.Fatalln("Err in finding category")
 		}
 		categoryId := getCategoryId(store.Id, categoryString)
+
+		description := itemPage.ChildText("div.product-about__description-content")
 
 		item := CoreStructs.RawItem{
 			Id:            id,
@@ -122,14 +119,14 @@ func parseItem(store CoreStructs.Store, addItemFunc AddItem, addSpecificationFun
 			IsOnSale:      isOnSale,
 			RawItemURL:    itemPage.Request.URL.String(),
 			RawCategoryId: categoryId,
-			Description:   "",
+			Description:   description,
 			RawIconURL:    pictureLink,
 		}
 
 		if price != 0 {
 			addItemFunc(item)
 
-			itemPage.ForEach("div.main_details_groupe", func(i int, specs *colly.HTMLElement) {
+			itemPage.ForEach("div.characteristics-full__item", func(i int, specs *colly.HTMLElement) {
 				parseSpecsForItem(id, addSpecificationFunc, specs)
 			})
 		}
@@ -144,33 +141,26 @@ func parseItem(store CoreStructs.Store, addItemFunc AddItem, addSpecificationFun
 	return itemsCollector
 }
 
-func parseCategory(store CoreStructs.Store, addCategoryFunc AddCategory, itemsCollector *colly.Collector) *colly.Collector {
+func parseCategory(store CoreStructs.Store, itemsCollector *colly.Collector) *colly.Collector {
 	categoriesCollector := colly.NewCollector(
 		colly.Async(ASYNC),
 	)
 
-	categoriesCollector.OnHTML("div.page", func(categoryPage *colly.HTMLElement) {
-		id := getCategoryId(store.Id, categoryPage.Request.URL.String())
-		pageHeader := categoryPage.ChildText("h1.with-counter")
+	categoriesCollector.OnHTML("a.goods-tile__heading", func(cardHeading *colly.HTMLElement) {
+		link := cardHeading.Attr("href")
 
-		category := CoreStructs.RawCategory{
-			Id:             id,
-			ParsedName:     pageHeader,
-			StoreId:        store.Id,
-			RawCategoryURL: categoryPage.Request.URL.String(),
+		err := itemsCollector.Visit(link)
+		if err != nil {
+			log.Println("Err parse item from subcategory page")
 		}
+	})
 
-		if category.ParsedName != "" {
-			addCategoryFunc(category)
+	categoriesCollector.OnHTML("li.tile-cats__item", func(categoryLink *colly.HTMLElement) {
+		link := categoryLink.ChildAttr("a", "href")
 
-			categoryPage.ForEach("a.card__title[href]", func(i int, productCardTitle *colly.HTMLElement) {
-				link := productCardTitle.Attr("href")
-
-				err := itemsCollector.Visit(store.URL + link)
-				if err != nil {
-					log.Println("Error in parsing item card element on category page!")
-				}
-			})
+		err := categoriesCollector.Visit(link)
+		if err != nil {
+			log.Println("Err in parsing subcategory page")
 		}
 	})
 
@@ -183,15 +173,33 @@ func parseCategory(store CoreStructs.Store, addCategoryFunc AddCategory, itemsCo
 	return categoriesCollector
 }
 
-func parseHomePage(store CoreStructs.Store, categoriesCollector *colly.Collector) *colly.Collector {
+func parseHomePage(store CoreStructs.Store, categoriesCollector *colly.Collector, addCategoryFunc AddCategory) *colly.Collector {
 	homePageCollector := colly.NewCollector(
 		colly.Async(ASYNC),
 	)
 
-	homePageCollector.OnHTML("div.subcategory__name", func(categoryElement *colly.HTMLElement) {
-		link := categoryElement.ChildAttr("a", "href")
+	homePageCollector.OnHTML("h1.portal__heading", func(categoryHeading *colly.HTMLElement) {
+		id := getCategoryId(store.Id, categoryHeading.Request.URL.String())
+		pageHeader := categoryHeading.Text
 
-		err := categoriesCollector.Visit(store.URL + link)
+		category := CoreStructs.RawCategory{
+			Id:             id,
+			ParsedName:     pageHeader,
+			StoreId:        store.Id,
+			RawCategoryURL: categoryHeading.Request.URL.String(),
+		}
+
+		addCategoryFunc(category)
+		err := categoriesCollector.Visit(categoryHeading.Request.URL.String())
+		if err != nil {
+			log.Println("Err in parsing category!")
+		}
+	})
+
+	homePageCollector.OnHTML("a.menu-categories__link", func(categoryElement *colly.HTMLElement) {
+		link := categoryElement.Attr("href")
+
+		err := homePageCollector.Visit(link)
 		if err != nil {
 			log.Println("Error in parsing category element in homepage!")
 		}
@@ -213,10 +221,10 @@ func main() {
 	db.SetMaxIdleConns(4)
 
 	store := CoreStructs.Store{
-		Id:      1,
-		Name:    "Foxtrot",
-		URL:     "https://foxtrot.com.ua",
-		IconURL: "https://foxtrotgroup.com.ua/brand.aspx?id=2",
+		Id:      2,
+		Name:    "Rozetka",
+		URL:     "https://rozetka.com.ua",
+		IconURL: "https://content1.rozetka.com.ua/sellers/logo_svg/original/187326382.svg",
 	}
 
 	err := genericDb.Insert(db, CoreStructs.StoreInsertQuery, store)
@@ -261,10 +269,10 @@ func main() {
 	}
 
 	itemCollector := parseItem(store, addItem, addSpecification)
-	categoryCollector := parseCategory(store, addCategory, itemCollector)
-	homePageCollector := parseHomePage(store, categoryCollector)
+	categoryCollector := parseCategory(store, itemCollector)
+	homePageCollector := parseHomePage(store, categoryCollector, addCategory)
 
-	homePageErr := homePageCollector.Visit("https://foxtrot.com.ua/uk/home/allcategories")
+	homePageErr := homePageCollector.Visit("https://rozetka.com.ua/ua")
 	if homePageErr != nil {
 		fmt.Println("Error in visiting main page")
 	}

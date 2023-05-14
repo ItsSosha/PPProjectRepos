@@ -12,7 +12,7 @@ public class StoreContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseNpgsql("User ID=postgres;Password=postgres;Host=localhost;Port=5432;Database=StoreDb;");
+        optionsBuilder.UseNpgsql("User ID=doadmin;Password=AVNS_y5YBzYRh_TXY10W9cwL;Host=db-postgresql-fra1-48384-do-user-11887088-0.b.db.ondigitalocean.com;Port=25060;Database=StoreDb;sslmode=require;Trust Server Certificate=true;");
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
