@@ -12,6 +12,7 @@ const ModalContent = styled.div`
   flex-direction: column;
   align-items: center;
   row-gap: 1em;
+  max-width: 920px;
 `;
 
 const Transition = forwardRef((props, ref) => {

@@ -16,8 +16,11 @@ import {
   NotFound,
   User,
   UserAbout,
-  UserWishlist
+  UserWishlist,
+  AdminApproved,
+  AdminUnapproved
  } from './pages';
+ import AdminRoutes from './auth/AdminRoutes';
 import App from './App';
 
 const Global = createGlobalStyle`
@@ -67,13 +70,27 @@ const router = createBrowserRouter([
           {
             path: "wishlist",
             element: <UserWishlist />
+          },
+          {
+            path: "admin",
+            element: <AdminRoutes />,
+            children: [
+              {
+                path: "approved",
+                element: <AdminApproved />
+              },
+              {
+                path: "unapproved",
+                element: <AdminUnapproved />
+              }
+            ]
           }
         ]
       },
       {
         path: "search",
         element: <SearchResults />
-      }
+      },
     ]
   }
 ])

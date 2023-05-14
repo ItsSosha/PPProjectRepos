@@ -7,6 +7,8 @@ import UserAbout from "./UserAbout";
 import UserWishlist from "./UserWishlist";
 import SearchResults from "./SearchResults";
 import NotFound from "./404";
+import AdminApproved from "./AdminApproved";
+import AdminUnapproved from "./AdminUnapproved";
 
 export {
   Home,
@@ -17,5 +19,7 @@ export {
   NotFound,
   User,
   UserAbout,
-  UserWishlist
+  UserWishlist,
+  AdminApproved,
+  AdminUnapproved
 };

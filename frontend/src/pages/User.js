@@ -9,6 +9,7 @@ import {
 
 import { NavLink, Outlet, useParams } from "react-router-dom";
 import styled from "styled-components";
+import { useAuthContext } from "../auth/auth";
 
 const StyledNavLink = styled(NavLink)`
 font-family: 'Inter', sans-serif;
@@ -27,6 +28,7 @@ color: #000;
 
 const User = (props) => {
   const { id } = useParams();
+  const user = useAuthContext();
 
   return (
     <Grid container>
@@ -51,6 +53,17 @@ const User = (props) => {
           <StyledNavLink to={`/users/${id}/wishlist`}>
             Список бажань
           </StyledNavLink>
+          {user.isAdmin
+          ? 
+            <>
+              <StyledNavLink to={`/users/${id}/admin/approved`}>
+                Затверджені товари
+              </StyledNavLink>
+              <StyledNavLink to={`/users/${id}/admin/unapproved`}>
+                Незатверджені товари
+              </StyledNavLink>
+            </> 
+          : null }
           <Button variant="text" sx={{
             paddingInline: "20px",
             paddingBlock: "12px",
