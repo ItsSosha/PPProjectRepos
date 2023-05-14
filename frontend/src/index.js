@@ -16,7 +16,8 @@ import {
   NotFound,
   User,
   UserAbout,
-  UserWishlist
+  UserWishlist,
+  SharedWishlist
  } from './pages';
 import App from './App';
 
@@ -73,6 +74,10 @@ const router = createBrowserRouter([
       {
         path: "search",
         element: <SearchResults />
+      },
+      {
+        path: "sharedwishlist/:id",
+        element: <SharedWishlist />
       }
     ]
   }

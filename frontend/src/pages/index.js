@@ -7,6 +7,7 @@ import UserAbout from "./UserAbout";
 import UserWishlist from "./UserWishlist";
 import SearchResults from "./SearchResults";
 import NotFound from "./404";
+import SharedWishlist from "./SharedWishlist";
 
 export {
   Home,
@@ -17,5 +18,6 @@ export {
   NotFound,
   User,
   UserAbout,
-  UserWishlist
+  UserWishlist,
+  SharedWishlist
 };
