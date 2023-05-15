@@ -9,6 +9,7 @@ public class RawItem : BaseEntity
     public bool IsOnSale { get; set; }
     public string RawItemURL { get; set; }
     public RawCategory RawCategory { get; set; }
+    public long RawCategoryId { get; set; }
     public string Description { get; set; }
     public IList<Specification> Specifications { get; set; }
 }
