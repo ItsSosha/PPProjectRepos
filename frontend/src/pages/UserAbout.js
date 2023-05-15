@@ -9,15 +9,15 @@ import { useAuthContext } from "../auth/auth";
 
 import FormField from "../components/FormField";
 
-const user = {
-  name: "Shark",
-  surname: "Fishers",
-  email: "shark@ocean.bul",
-  isPremium: false,
-}
+// const user = {
+//   name: "Shark",
+//   surname: "Fishers",
+//   email: "shark@ocean.bul",
+//   isPremium: false,
+// }
 
 const UserAbout = (props) => {
-  const user = useAuthContext();
+  const { user } = useAuthContext();
   console.log(user);
   return (
     <>

@@ -7,7 +7,7 @@ import {
   Typography
 } from "@mui/material";
 
-import { NavLink, Outlet, useParams } from "react-router-dom";
+import { NavLink, Outlet, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { useAuthContext } from "../auth/auth";
 
@@ -28,9 +28,18 @@ color: #000;
 
 const User = (props) => {
   const { id } = useParams();
-  const user = useAuthContext();
-  console.log(document.cookie);
+  const { user, logout } = useAuthContext();
+  const navigate = useNavigate();
 
+  const handleLogout = () => {
+    document.cookie = `firstName=; max-age=-1;`;
+    document.cookie = `lastName=; max-age=-1;`;
+    document.cookie = `email=; max-age=-1;`;
+    document.cookie = `profilePictureURL=; max-age=-1;`;
+
+    logout();
+    navigate('/');
+  }
 
   return (
     <Grid container>
@@ -72,7 +81,7 @@ const User = (props) => {
               </StyledNavLink>
             </> 
           : null }
-          <Button variant="text" sx={{
+          <Button variant="text" onClick={handleLogout} sx={{
             paddingInline: "20px",
             paddingBlock: "12px",
             borderBlock: "1px solid rgba(0, 0, 0, 0.15)",

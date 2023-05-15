@@ -24,7 +24,7 @@ const GridItemContainer = styled.div`
 `;
 
 const Header = ({ handleSidebarClick, setLoginModalOpen }) => {
-  const user = useAuthContext();
+  const { user } = useAuthContext();
 
   return (
     <AppBar

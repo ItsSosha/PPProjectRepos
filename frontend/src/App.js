@@ -17,16 +17,19 @@ function App() {
 
   function handleLogin(resp) {
     setLoginModalOpen(false);
-    setUser({
-      name: "sasha",
-      isAdmin: true
-    });
     
     let decoded = jwt_decode(resp.credential);
     document.cookie = `firstName=${decoded["given_name"]}; max-age=${Math.ceil(decoded["exp"] / 1000)}`;
     document.cookie = `lastName=${decoded["family_name"]}; max-age=${Math.ceil(decoded["exp"] / 1000)};`;
     document.cookie = `email=${decoded["email"]}; max-age=${Math.ceil(decoded["exp"] / 1000)};`;
-    document.cookie = `profilePictureURL=${decoded["picture"]}; max-age=${Math.ceil(decoded["exp"] / 1000)};`;
+    document.cookie = `profilePictureURL=${decoded["picture"].slice(0, decoded["picture"].indexOf("s96-c")) + "s256-c"}; max-age=${Math.ceil(decoded["exp"] / 1000)};`;
+
+    setUser({
+      firstName: decoded["given_name"],
+      lastName: decoded["family_name"],
+      email: decoded["email"],
+      profilePictureURL: decoded["picture"].slice(0, decoded["picture"].indexOf("s96-c")) + "s256-c"
+    });
 
     navigate("/users/0/about");
   }
@@ -56,7 +59,7 @@ function App() {
   }, []);
 
   return (
-    <AuthProvider value={user}>
+    <AuthProvider value={{user: user, logout: () => setUser(false)}}>
       <Header handleSidebarClick={() => setSidebarOpen(true)} setLoginModalOpen={() => setLoginModalOpen(true)} />
       <Modal open={isLoginModalOpen} onModalClose={() => setLoginModalOpen(false)}>
         <ModalAuth />
