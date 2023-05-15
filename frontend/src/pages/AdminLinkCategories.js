@@ -32,7 +32,7 @@ const AdminLinkCategories = () => {
             <Modal
                 open={activeCategory != null}
                 onModalClose={() => setActiveCategory(null)}>
-                <ModalEditRawCategory onCategoryChange={handleCategoryChange}/>
+                <ModalEditRawCategory onCategoryChange={handleCategoryChange} defaultCategory={rawCategories[activeCategory]?.category}/>
             </Modal>
             <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">

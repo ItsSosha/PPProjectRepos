@@ -10,42 +10,12 @@ column-gap: 1em;
 width: 40ch;
 `
 
-const ModalEditRawCategory = ({onCategoryChange}) => {
+const ModalEditRawCategory = ({onCategoryChange, defaultCategory}) => {
 
-    const [selectedCategory, setSelectedCategory] = useState('');
-
-    // return (
-    //     <form onSubmit={e => onCategoryChange(e, selectedCategory)}>
-    //         <select onChange={e => setSelectedCategory(e.target.value)} value={selectedCategory}>
-    //             <option selected disabled value=''>Оберіть категорію</option>
-    //             {categories.map((category) => {
-    //                 return (
-    //                     <option value={category.text}>{category.text}</option>
-    //                 )
-    //             })}
-    //         </select>
-    //         <Button
-    //             variant="contained"
-    //             color="secondary"
-    //             sx={{
-    //                 color: "#FFF"
-    //             }}
-    //             type="submit">
-    //             Зберегти
-    //         </Button>
-    //     </form>
-    // )
+    const [selectedCategory, setSelectedCategory] = useState(defaultCategory);
 
     return (
         <Form onSubmit={e => onCategoryChange(e, selectedCategory)}>
-            {/* <select onChange={e => setSelectedCategory(e.target.value)} value={selectedCategory}>
-                <option selected disabled value=''>Оберіть категорію</option>
-                {categories.map((category) => {
-                    return (
-                        <option value={category.text}>{category.text}</option>
-                    )
-                })}
-            </select> */}
             <FormControl fullWidth color="secondary">
                 <InputLabel id="category">Категорія</InputLabel>
                 <Select

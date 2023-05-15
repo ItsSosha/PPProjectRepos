@@ -42,7 +42,7 @@ const AdminManageCategories = () => {
                     mb: 2,
                     p: 1
                 }}>
-                    <TextField name="newCategory" color='secondary' label="Нова категорія" variant="filled" value={categoryName} onChange={e => setCategoryName(e.target.value)}/>
+                    <TextField required name="newCategory" color='secondary' label="Нова категорія" variant="filled" value={categoryName} onChange={e => setCategoryName(e.target.value)}/>
                     <Button
                         variant="contained"
                         color="secondary"
