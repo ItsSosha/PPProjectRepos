@@ -29,6 +29,8 @@ color: #000;
 const User = (props) => {
   const { id } = useParams();
   const user = useAuthContext();
+  console.log(document.cookie);
+
 
   return (
     <Grid container>
@@ -53,7 +55,7 @@ const User = (props) => {
           <StyledNavLink to={`/users/${id}/wishlist`}>
             Список бажань
           </StyledNavLink>
-          {user.isAdmin
+          {user?.isAdmin
           ? 
             <>
               <StyledNavLink to={`/users/${id}/admin/approved`}>
