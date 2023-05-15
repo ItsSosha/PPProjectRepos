@@ -7,12 +7,14 @@ import {
   Container,
   Grid,
   TextField,
-  InputAdornment
+  InputAdornment,
+  Button
 } from "@mui/material";
 
 import Logo from "./Logo";
 import { Person, Menu, StarOutlineRounded, Search } from "@mui/icons-material";
 import { Link } from "react-router-dom";
+import { useAuthContext } from "../auth/auth";
 
 const GridItemContainer = styled.div`
   display: flex;
@@ -21,7 +23,9 @@ const GridItemContainer = styled.div`
   column-gap: 8px;
 `;
 
-const Header = ({ handleSidebarClick }) => {
+const Header = ({ handleSidebarClick, setLoginModalOpen }) => {
+  const user = useAuthContext();
+
   return (
     <AppBar
       sx={{
@@ -66,7 +70,8 @@ const Header = ({ handleSidebarClick }) => {
             <Grid item xs={1}>
               <GridItemContainer>
                 <IconButton
-                  component={Link}
+                  onClick={user ? () => {} : () => setLoginModalOpen(true)}
+                  component={(user) ? Link : Button}
                   to="/users/1/about">
                   
                   <Person sx={{ color: "rgba(0, 0, 0, 1)" }} />
