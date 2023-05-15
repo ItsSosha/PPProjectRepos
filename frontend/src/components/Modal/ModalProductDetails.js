@@ -1,4 +1,4 @@
-import { Typography, Box, Button } from "@mui/material";
+import { Typography, Box, Button, Link } from "@mui/material";
 import styled from "styled-components";
 
 const ProductRow = styled.div`
@@ -10,7 +10,6 @@ width: 100%;
 
 const ModalProductDetails = ({ product, onItemChange}) => {
 
-  console.log(product);
   if (!product) {
     return null;
   }
@@ -62,7 +61,7 @@ const ModalProductDetails = ({ product, onItemChange}) => {
           color="secondary"
           align="left"
         >
-          {product.rawItemUrl}
+          <Link href={product.rawItemUrl} color="inherit">Посилання</Link>
         </Typography>
       </ProductRow>
       <ProductRow>

@@ -62,6 +62,12 @@ const User = (props) => {
               <StyledNavLink to={`/users/${id}/admin/unapproved`}>
                 Незатверджені товари
               </StyledNavLink>
+              <StyledNavLink to={`/users/${id}/admin/manageCategories`}>
+                Управління категоріями
+              </StyledNavLink>
+              <StyledNavLink to={`/users/${id}/admin/linkCategories`}>
+                Пов'язання категорій
+              </StyledNavLink>
             </> 
           : null }
           <Button variant="text" sx={{

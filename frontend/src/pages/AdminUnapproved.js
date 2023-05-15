@@ -34,37 +34,37 @@ const AdminUnapproved = () => {
                 <ModalProductDetails product={rows[activeItem]} onItemChange={() => handleItemChange(activeItem)}/>
             </Modal>
             <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                <TableHead>
-                <TableRow>
-                    <TableCell>Item name</TableCell>
-                    <TableCell align="right">Vendor</TableCell>
-                    <TableCell align="right"></TableCell>
-                </TableRow>
-                </TableHead>
-                <TableBody>
-                {rows.map((row, index) => (
-                    <TableRow
-                    key={row.name}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                    >
-                    <TableCell component="th" scope="row">
-                        {row.name}
-                    </TableCell>
-                    <TableCell align="right"><img src={row.vendorIcon} style={{"height": "1.5em"}}/></TableCell>
-                    <TableCell align="right">
-                        <Button
-                            variant="contained"
-                            color="secondary"
-                            sx={{color: "#FFF"}}
-                            onClick={() => setActiveItem(index)}>
-                                Деталі
-                        </Button>
-                    </TableCell>
+                <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                    <TableHead>
+                    <TableRow>
+                        <TableCell>Item name</TableCell>
+                        <TableCell align="right">Магазин</TableCell>
+                        <TableCell align="right"></TableCell>
                     </TableRow>
-                ))}
-                </TableBody>
-            </Table>
+                    </TableHead>
+                    <TableBody>
+                    {rows.map((row, index) => (
+                        <TableRow
+                        key={row.name}
+                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                        >
+                        <TableCell component="th" scope="row">
+                            {row.name}
+                        </TableCell>
+                        <TableCell align="right"><img src={row.vendorIcon} style={{"height": "1.5em"}}/></TableCell>
+                        <TableCell align="right">
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                sx={{color: "#FFF"}}
+                                onClick={() => setActiveItem(index)}>
+                                    Деталі
+                            </Button>
+                        </TableCell>
+                        </TableRow>
+                    ))}
+                    </TableBody>
+                </Table>
             </TableContainer>
         </div>
     )

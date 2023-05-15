@@ -10,6 +10,8 @@ import NotFound from "./404";
 import SharedWishlist from "./SharedWishlist";
 import AdminApproved from "./AdminApproved";
 import AdminUnapproved from "./AdminUnapproved";
+import AdminManageCategories from "./AdminManageCategoies";
+import AdminLinkCategories from "./AdminLinkCategories";
 
 export {
   Home,
@@ -23,5 +25,7 @@ export {
   UserWishlist,
   SharedWishlist,
   AdminApproved,
-  AdminUnapproved
+  AdminUnapproved,
+  AdminManageCategories,
+  AdminLinkCategories
 };

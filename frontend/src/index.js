@@ -19,7 +19,9 @@ import {
   UserWishlist,
   SharedWishlist,
   AdminApproved,
-  AdminUnapproved
+  AdminUnapproved,
+  AdminManageCategories,
+  AdminLinkCategories
  } from './pages';
  import AdminRoutes from './auth/AdminRoutes';
 import App from './App';
@@ -83,6 +85,14 @@ const router = createBrowserRouter([
               {
                 path: "unapproved",
                 element: <AdminUnapproved />
+              },
+              {
+                path: "manageCategories",
+                element: <AdminManageCategories />
+              },
+              {
+                path: "linkCategories",
+                element: <AdminLinkCategories />
               }
             ]
           }

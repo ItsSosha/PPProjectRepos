@@ -38,7 +38,7 @@ const AdminApproved = () => {
                 <TableHead>
                 <TableRow>
                     <TableCell>Item name</TableCell>
-                    <TableCell align="right">Vendor</TableCell>
+                    <TableCell align="right">Магазин</TableCell>
                     <TableCell align="right"></TableCell>
                 </TableRow>
                 </TableHead>
