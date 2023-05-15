@@ -12,6 +12,7 @@ import {
 
 import Logo from "./Logo";
 import { Person, Menu, StarOutlineRounded, Search } from "@mui/icons-material";
+import { Link } from "react-router-dom";
 
 const GridItemContainer = styled.div`
   display: flex;
@@ -64,7 +65,10 @@ const Header = ({ handleSidebarClick }) => {
             </Grid>
             <Grid item xs={1}>
               <GridItemContainer>
-                <IconButton>
+                <IconButton
+                  component={Link}
+                  to="/users/1/about">
+                  
                   <Person sx={{ color: "rgba(0, 0, 0, 1)" }} />
                 </IconButton>
               </GridItemContainer>

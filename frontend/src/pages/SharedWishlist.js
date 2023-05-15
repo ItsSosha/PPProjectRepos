@@ -1,12 +1,6 @@
-import {
-  Box,
-  Button,
-  Pagination,
-  Stack,
-  Typography,
-} from "@mui/material";
-import ProductsList from "../components/ProductsList/ProductList";
+import { Box, Pagination, Stack, Typography } from "@mui/material";
 import { useState } from "react";
+import ProductsList from "../components/ProductsList/ProductList";
 
 const dummyData = [
   {
@@ -54,56 +48,48 @@ const dummyData = [
 const PER_ROW = 4;
 const ROWS = 2;
 
-
-const UserWishlist = (props) => {
+const SharedWishlist = (props) => {
   const [favourites, setFavourites] = useState(dummyData);
   const [page, setPage] = useState(1);
 
-
   return (
-    <>
-      <Box display="flex" justifyContent="space-between" sx={{
-        marginBottom: "2rem"
-      }}>
-        <Typography variant="h4" fontWeight="700">
-          Список бажань
-        </Typography>
-        <Button variant="outlined" color="secondary" onClick={() => setFavourites([])}>
-          Видалити всі
-        </Button>
-      </Box>
-      {(favourites.length > 0) ?
-        <>
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      height="100%"
+    >
+      <Typography variant="h4" fontWeight="700" mb={4}>
+        Список бажань користувача Username
+      </Typography>
+      <Box>
         <ProductsList
           data={favourites}
           itemsPerRow={PER_ROW}
           rows={ROWS}
           page={page}
         />
-        <Stack alignItems="center" mt={2}>
+      </Box>
+      <Stack alignItems="center" mt={2}>
         <Pagination
-            count={Math.ceil(favourites.length / (PER_ROW * ROWS))}
-            page={page}
-            onChange={(e, value) => setPage(value)}
-            sx={{
-              justifyContent: "center",
-              "& .MuiPaginationItem-root": {
-                fontWeight: "700",
-                fontSize: "1rem",
-              },
-              "& .Mui-selected" : {
-                textDecoration: "underline",
-                backgroundColor: "transparent",
-              }
-            }}
-          />
-        </Stack>
-        </> :
-        <Typography variant="h4">
-          На даний момент ваш кошик пустий
-        </Typography>}
-    </>
+          count={Math.ceil(favourites.length / (PER_ROW * ROWS))}
+          page={page}
+          onChange={(e, value) => setPage(value)}
+          sx={{
+            justifyContent: "center",
+            "& .MuiPaginationItem-root": {
+              fontWeight: "700",
+              fontSize: "1rem",
+            },
+            "& .Mui-selected": {
+              textDecoration: "underline",
+              backgroundColor: "transparent",
+            }
+          }}
+        />
+      </Stack>
+    </Box>
   )
 };
 
-export default UserWishlist;
+export default SharedWishlist;

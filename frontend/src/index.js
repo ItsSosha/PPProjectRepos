@@ -16,8 +16,14 @@ import {
   NotFound,
   User,
   UserAbout,
-  UserWishlist
+  UserWishlist,
+  SharedWishlist,
+  AdminApproved,
+  AdminUnapproved,
+  AdminManageCategories,
+  AdminLinkCategories
  } from './pages';
+ import AdminRoutes from './auth/AdminRoutes';
 import App from './App';
 
 const Global = createGlobalStyle`
@@ -67,12 +73,38 @@ const router = createBrowserRouter([
           {
             path: "wishlist",
             element: <UserWishlist />
+          },
+          {
+            path: "admin",
+            element: <AdminRoutes />,
+            children: [
+              {
+                path: "approved",
+                element: <AdminApproved />
+              },
+              {
+                path: "unapproved",
+                element: <AdminUnapproved />
+              },
+              {
+                path: "manageCategories",
+                element: <AdminManageCategories />
+              },
+              {
+                path: "linkCategories",
+                element: <AdminLinkCategories />
+              }
+            ]
           }
         ]
       },
       {
         path: "search",
         element: <SearchResults />
+      },
+      {
+        path: "sharedwishlist/:id",
+        element: <SharedWishlist />
       }
     ]
   }
