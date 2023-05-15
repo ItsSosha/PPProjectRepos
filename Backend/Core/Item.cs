@@ -9,9 +9,3 @@ public class Item : BaseEntity
     public IList<PriceHistory> PriceHistories { get; set; }
     
 }
-
-public class AddReviewDto
-{
-    public Review Review { get; set; }
-    public User User { get; set; }
-}
