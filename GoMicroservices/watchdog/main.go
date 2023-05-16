@@ -133,7 +133,7 @@ func main() {
 	for true {
 		if lastDate, err := getLastDate(db); err != nil || (err == nil && time.Now().AddDate(0, 0, -1).After(lastDate)) {
 			watchdogIteration(db)
-			time.Sleep(time.Hour*24 + 1*time.Minute)
 		}
+		time.Sleep(time.Hour*24 + 1*time.Minute)
 	}
 }
