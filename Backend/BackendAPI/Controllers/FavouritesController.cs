@@ -85,5 +85,23 @@ namespace BackendAPI.Controllers
 
             return Ok();
         }
+        
+        [HttpDelete]
+        [Route("deleteAll")]
+        public async Task<ActionResult> DeleteAll([FromForm] string jwt)
+        {
+            var user = await _userRepository.GetOrRegisterUser(jwt);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            if (!await _userRepository.RemoveAllFromFavourites(user))
+            {
+                return NotFound();
+            }
+
+            return Ok();
+        }
     }
 }

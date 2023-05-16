@@ -11,4 +11,5 @@ public interface IUserRepository
     Task<bool> RemoveFromFavourites(User user, Item item);
     Task<IList<UserItem>> GetFavourites(User user);
     Task<ResultPage<UserItem>> GetFavouritesPaginated(User user, int offset, int limit);
+    Task<bool> RemoveAllFromFavourites(User user);
 }
