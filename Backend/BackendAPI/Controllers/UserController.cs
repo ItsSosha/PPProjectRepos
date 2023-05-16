@@ -27,7 +27,7 @@ namespace BackendAPI.Controllers
             var user = await _userRepository.GetOrRegisterUser(jwt);
             if (user == null)
             {
-                return NotFound();
+                return Unauthorized();
             }
 
             return user;
