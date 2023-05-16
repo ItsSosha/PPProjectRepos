@@ -4,10 +4,6 @@ namespace DataLayer.Abstract;
 
 public interface IItemRepository
 {
-    public Task<bool> AddToFavourites(User user, long id); // makes sense now
-
-    public Task<bool> RemoveFromFavourites(User user, long id); // that's method by clicking a star
-
     public Task<bool> AddReview(Review review, long id, String userId); // check, think makes sense,  do we need User???
 
     public Task<List<Item>> GetAllAsync();

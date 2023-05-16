@@ -14,42 +14,6 @@ public class ItemRepository : IItemRepository
         _db = db;
     }
 
-    public async Task<bool> AddToFavourites(User user, long id)
-    {
-        Item item = await _db.Items.FirstOrDefaultAsync(x => x.Id == id);
-
-        if (item != null && !user.Favourites.Any(x => x.Item.Id == id))
-        {
-            UserItem favourite = new UserItem()
-            {
-                User = user,
-                Item = item,
-            };
-
-            user.Favourites.Add(favourite);
-            await _db.SaveChangesAsync();
-
-            return true;
-        }
-
-        return false;
-    }
-    
-    public async Task<bool> RemoveFromFavourites(User user, long id)
-    {
-        UserItem favourite = user.Favourites.FirstOrDefault(x => x.Item.Id == id);
-
-        if (favourite != null)
-        {
-            user.Favourites.Remove(favourite);
-            await _db.SaveChangesAsync();
-
-            return true;
-        }
-
-        return false;
-    }
-    
     // it can be implemented in reviewRepository ??
     public async Task<bool> AddReview(Review review, long id, String userId)
     {
