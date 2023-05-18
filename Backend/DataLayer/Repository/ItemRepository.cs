@@ -13,13 +13,12 @@ public class ItemRepository : IItemRepository
         _db = db;
     }
 
-    public async Task<bool> AddReview(Review review, long id, User user)
+    public async Task<bool> AddReview(Review review, long id)
     {
         Item item = await _db.Items.FirstOrDefaultAsync(x => x.Id == id);
-        
+
         if (item != null)
         {
-            review.User = user; // makes sense ? 
             item.Reviews.Add(review);
             await _db.SaveChangesAsync();
 
@@ -27,11 +26,11 @@ public class ItemRepository : IItemRepository
         }
 
         return false;
-    } 
-    
+    }
+
     public async Task<ResultPage<Item>> GetAll(int offset, int limit)
     {
-        return await  GenericPaginator.Paginate(_db.Items
+        return await GenericPaginator.Paginate(_db.Items
             .Include(i => i.RawItem)
             .ThenInclude(c => c.RawCategory), offset, limit);
     }
@@ -70,10 +69,10 @@ public class ItemRepository : IItemRepository
             .Include(ri => ri.RawItem)
             .Skip(startIndex)
             .Take(5)
-            .Where(c => c.RawItem.RawCategory == item.RawItem.RawCategory )
+            .Where(c => c.RawItem.RawCategory == item.RawItem.RawCategory)
             .ToListAsync();
     }
-    
+
     public async Task<Item?> GetByIdAsync(long id)
     {
         var item = _db.Items.FirstOrDefault(x => x.Id == id);
@@ -108,22 +107,104 @@ public class ItemRepository : IItemRepository
 
         return item;
     }
-    
+
     public async Task<List<PriceHistory>> GetPriceHistory(long id)
     {
         Item item = _db.Items.Find(id);
 
-        if(item != null)
+        if (item != null)
         {
             var priceHistories = await _db.PriceHistories
                 .Where(x => x.ItemId == item.Id)
                 .Select(x => x)
                 .ToListAsync();
-            
+
             priceHistories.ForEach(x => x.Item = null);
             return priceHistories;
         }
-        
+
         return null;
+    }
+
+    public async Task<ResultPage<Item>> GetItemsByCategory(string categoryName, int priceFrom, int priceTo, bool isOnSale, bool isFoxtrot, bool isRozetka, int offset, int limit)
+    {
+        var query = _db.Items
+            .Include(i => i.RawItem)
+            .ThenInclude(c => c.RawCategory)
+            .ThenInclude(s => s.Store)
+            .Where(c => c.RawItem.RawCategory.ParsedName == categoryName);
+
+        if (priceFrom != 0)
+        {
+            query = query.Where(c => c.RawItem.RawPrice >= priceFrom);
+        }
+
+        if (priceTo != 0)
+        {
+            query = query.Where(c => c.RawItem.RawPrice <= priceTo);
+        }
+
+        if (isOnSale)
+        {
+            query = query.Where(c => c.RawItem.IsOnSale == true);
+        }
+        
+        if (isRozetka && isFoxtrot)
+        {
+            query = query.Where(c => c.RawItem.RawCategory.Store.Name == "Foxtrot" ||  c.RawItem.RawCategory.Store.Name == "Rozetka");
+        }
+        
+        else if (isFoxtrot)
+        {
+            query = query.Where(c => c.RawItem.RawCategory.Store.Name == "Foxtrot");
+        }
+        
+        else if (isRozetka)
+        {
+            query = query.Where(c => c.RawItem.RawCategory.Store.Name == "Rozetka");
+        }
+
+        return await GenericPaginator.Paginate(query, offset, limit);
+    }
+    
+    public async Task<ResultPage<Item>> GetItemsBySearch(string searchResult, int priceFrom, int priceTo, bool isOnSale, bool isFoxtrot, bool isRozetka, int offset, int limit)
+    {
+        var query = _db.Items
+            .Include(i => i.RawItem)
+            .ThenInclude(c => c.RawCategory)
+            .ThenInclude(s => s.Store)
+            .Where((c => c.RawItem.Name.ToLower().Contains(searchResult.ToLower()) || 
+                        c.RawItem.Description.ToLower().Contains(searchResult.ToLower())));
+
+        if (priceFrom != 0)
+        {
+            query = query.Where(c => c.RawItem.RawPrice >= priceFrom);
+        }
+
+        if (priceTo != 0)
+        {
+            query = query.Where(c => c.RawItem.RawPrice <= priceTo);
+        }
+
+        if (isOnSale)
+        {
+            query = query.Where(c => c.RawItem.IsOnSale == true);
+        }
+
+        if (isRozetka && isFoxtrot)
+        {
+            query = query.Where(c => c.RawItem.RawCategory.Store.Name == "Foxtrot" ||  c.RawItem.RawCategory.Store.Name == "Rozetka");
+        }
+        else if (isFoxtrot)
+        {
+            query = query.Where(c => c.RawItem.RawCategory.Store.Name == "Foxtrot");
+        }
+        
+        else if (isRozetka)
+        {
+            query = query.Where(c => c.RawItem.RawCategory.Store.Name == "Rozetka");
+        }
+
+        return await GenericPaginator.Paginate(query, offset, limit);
     }
 }

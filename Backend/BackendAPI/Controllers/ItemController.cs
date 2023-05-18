@@ -47,20 +47,26 @@ namespace BackendAPI.Controllers
         }
         
         [HttpPost]
-        public async Task<ActionResult> AddReview([FromForm] string jwt, long id, Review review) 
+        public async Task<ActionResult> AddReview([FromForm] string jwt, long id, string reviewText, int rating) 
         {
-            if (review != null)
-            {
-                var user = await _userRepository.GetOrRegisterUser(jwt);
-                if (user != null)
-                {
-                    bool isAdded = await _itemRepository.AddReview(review, id, user);
-                }
 
-                return Unauthorized();
+            var user = await _userRepository.GetOrRegisterUser(jwt);
+            
+            if (user != null)
+            {
+                Review review = new Review()
+                {
+                    Grade = rating,
+                    ReviewText = reviewText,
+                    ItemId = id, // ??
+                    User = user,
+                };
+                
+                bool isAdded = await _itemRepository.AddReview(review, id);
             }
 
-            return BadRequest(); //maybe
+            return Unauthorized();
+
         }
         
         [HttpGet]
@@ -79,9 +85,9 @@ namespace BackendAPI.Controllers
             return Ok(items);
         }
         
-        [HttpGet("{id}")]
+        [HttpGet]
         [Route("getRecommended")]
-        public async Task<ActionResult<IList<Item>>> GetRecommended(long id)
+        public async Task<ActionResult<IList<Item>>> GetRecommended([FromQuery]long id)
         {
             var item = await _itemRepository.GetByIdAsync(id);
             if (item != null)
@@ -92,6 +98,32 @@ namespace BackendAPI.Controllers
                     return Ok(recommendedItems);
                 }
                 return NotFound();
+            }
+
+            return NotFound();
+        }
+
+        [HttpGet]
+        [Route("filterByCategory")]
+        public async Task<ActionResult<ResultPage<Item>>> GetItemsByCategory([FromQuery] string categoryName, int priceFrom, int PriceTo, bool isOnSale, bool isFoxtrot, bool isRozetka, int offset, int limit)
+        {
+            var filteredItems = await _itemRepository.GetItemsByCategory(categoryName, priceFrom, PriceTo, isOnSale, isFoxtrot, isRozetka, offset, limit);
+            
+            if (filteredItems != null)
+            {
+                return Ok(filteredItems);
+            }
+
+            return NotFound();
+        }
+        [HttpGet]
+        [Route("searchByName")]
+        public async Task<ActionResult<ResultPage<Item>>> GetItemsBySearch([FromQuery] string searchResult, int priceFrom, int PriceTo, bool isOnSale, bool isFoxtrot, bool isRozetka, int offset, int limit)
+        {
+            var items = await _itemRepository.GetItemsBySearch(searchResult, priceFrom, PriceTo, isOnSale, isFoxtrot, isRozetka, offset, limit);
+            if (items != null)
+            {
+                return Ok(items);
             }
 
             return NotFound();
