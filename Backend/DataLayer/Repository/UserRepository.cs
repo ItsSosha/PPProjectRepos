@@ -166,4 +166,23 @@ public class UserRepository : IUserRepository
             .ThenInclude(i => i.RawItem)
             .Where(x => x.User.Id == user.Id), offset, limit);
     }
+    
+    public async Task<bool> RemoveAllFromFavourites(User user)
+    {
+        if (user == null ||
+            !_db.UserItems
+                .Include(ui => ui.User)
+                .Include(ui => ui.Item)
+                .Any(x => x.User.Id == user.Id))
+        {
+            return false;
+        }
+        
+        
+        _db.UserItems.RemoveRange(_db.UserItems.Include(ui => ui.User).Where(x => x.Id == user.Id));
+        await _db.SaveChangesAsync();
+        user.Favourites = (await this.GetById(user.Id))!.Favourites;
+
+        return true;
+    }
 }

@@ -46,21 +46,19 @@ func isPriceHistoryInitialised(db *sqlx.DB, itemId int64) bool {
 }
 
 func getLastDate(db *sqlx.DB) (time.Time, error) {
-	query := "SELECT max(\"Date\") from " + CoreStructs.PriceHistoryInsertQuery
+	query := "SELECT max(\"Date\") from " + CoreStructs.PriceHistoryTableName
 
 	if err := db.Ping(); err != nil {
 		panic("Connection error!")
 	}
 
-	var result struct {
-		max time.Time
-	}
+	var result time.Time
 	err := db.Get(&result, query)
 	if err != nil {
 		log.Println("Err to get last date")
 	}
 
-	return result.max, err
+	return result, err
 }
 
 func watchdogIteration(db *sqlx.DB) {
@@ -135,7 +133,7 @@ func main() {
 	for true {
 		if lastDate, err := getLastDate(db); err != nil || (err == nil && time.Now().AddDate(0, 0, -1).After(lastDate)) {
 			watchdogIteration(db)
-			time.Sleep(time.Hour*24 + 1*time.Minute)
 		}
+		time.Sleep(time.Hour*24 + 1*time.Minute)
 	}
 }
