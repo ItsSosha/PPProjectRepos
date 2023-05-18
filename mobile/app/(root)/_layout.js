@@ -19,6 +19,13 @@ const RootLayout = (props) => {
           title: "Wishlist"
         }}
       />
+      <Drawer.Screen
+        name="products/[id]"
+        options={{
+          drawerItemStyle: {display: 'none'},
+          title: "Product page",
+        }}
+      />
     </Drawer>
   )
 };

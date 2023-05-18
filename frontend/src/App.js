@@ -23,12 +23,14 @@ function App() {
     document.cookie = `lastName=${decoded["family_name"]}; max-age=${Math.ceil(decoded["exp"] / 1000)};`;
     document.cookie = `email=${decoded["email"]}; max-age=${Math.ceil(decoded["exp"] / 1000)};`;
     document.cookie = `profilePictureURL=${decoded["picture"].slice(0, decoded["picture"].indexOf("s96-c")) + "s256-c"}; max-age=${Math.ceil(decoded["exp"] / 1000)};`;
+    document.cookie = `isAdmin=${true}; max-age=${Math.ceil(decoded["exp"] / 1000)};`;
 
     setUser({
       firstName: decoded["given_name"],
       lastName: decoded["family_name"],
       email: decoded["email"],
-      profilePictureURL: decoded["picture"].slice(0, decoded["picture"].indexOf("s96-c")) + "s256-c"
+      profilePictureURL: decoded["picture"].slice(0, decoded["picture"].indexOf("s96-c")) + "s256-c",
+      isAdmin: true
     });
 
     navigate("/users/0/about");
@@ -42,7 +44,7 @@ function App() {
     });
 
     const cookies = document.cookie;
-    const regex = /(firstName|lastName|email|profilePictureURL)=([^;]*)/g;
+    const regex = /(firstName|lastName|email|profilePictureURL|isAdmin)=([^;]*)/g;
     const matches = cookies.matchAll(regex);
     
     const user = {};
