@@ -41,7 +41,7 @@ public class ItemRepository : IItemRepository
             };
 
             _db.Items.Add(item);
-            _db.SaveChangesAsync();
+            await _db.SaveChangesAsync();
             return true;
         }
 

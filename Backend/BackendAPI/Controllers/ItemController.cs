@@ -1,4 +1,5 @@
-﻿using Core;
+﻿using System.ComponentModel;
+using Core;
 using Microsoft.AspNetCore.Mvc;
 using DataLayer.Abstract;
 
@@ -20,18 +21,18 @@ namespace BackendAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ResultPage<Item>>> GetAll([FromQuery]int offset, int limit)
+        public async Task<ActionResult<ResultPage<Item>>> GetAll(int offset, int limit)
         {
             return await _itemRepository.GetAll(offset, limit);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Item>> GetById([FromQuery] long id, string jwt = "")
+        public async Task<ActionResult<Item>> GetById(long id, string? jwt = null)
         {
             Item item = await _itemRepository.GetByIdAsync(id);
             if (item != null)
             {
-                User user = await _userRepository.GetOrRegisterUser(jwt);
+                User user = await _userRepository.GetOrRegisterUser(jwt ?? "uihfjhbf");
 
                 if (user != null &&  await _subscriptionRepository.IsUserPremium(user))
                 {
