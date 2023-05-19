@@ -10,11 +10,13 @@ namespace BackendAPI.Controllers
     {
         private readonly IItemRepository _itemRepository;
         private readonly IUserRepository _userRepository;
+        private readonly ISubscriptionRepository _subscriptionRepository;
 
-        public ItemController(IItemRepository itemRepository, IUserRepository userRepository)
+        public ItemController(IItemRepository itemRepository, IUserRepository userRepository, ISubscriptionRepository subscriptionRepository)
         {
             _itemRepository = itemRepository;
             _userRepository = userRepository;
+            _subscriptionRepository = subscriptionRepository;
         }
 
         [HttpGet]
@@ -24,26 +26,48 @@ namespace BackendAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Item>> GetById([FromQuery] long userId, long id)
+        public async Task<ActionResult<Item>> GetById([FromQuery] string jwt, long id)
         {
             Item item = await _itemRepository.GetByIdAsync(id);
             if (item != null)
             {
-                User user = await _userRepository.GetById(userId);
+                User user = await _userRepository.GetOrRegisterUser(jwt);
 
-                /*if (user != null && user.IsPremium())
+                if (user != null &&  await _subscriptionRepository.IsUserPremium(user))
                 {
                     item.PriceHistories = await _itemRepository.GetPriceHistory(id);
                 }
                 else
                 {
                     return Unauthorized();
-                }*/
+                }
 
                 return Ok(item);
             }
             
             return NotFound();
+        }
+        
+        [HttpGet]
+        [Route("getRawItemById")]
+        public async Task<ActionResult<RawItem?>> GetRawItemById([FromQuery] string jwt, long id)
+        {
+            User user = await _userRepository.GetOrRegisterUser(jwt);
+
+            if (user.IsAdmin)
+            {
+                var rawItem = await _itemRepository.GetRawItemById(id);
+                if (rawItem != null)
+                {
+                    return Ok(rawItem);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            
+            return Unauthorized(); // ?? 
         }
         
         [HttpPost]
@@ -68,7 +92,26 @@ namespace BackendAPI.Controllers
             return Unauthorized();
 
         }
+
+        [HttpPost]
+        [Route("addToItems")]
+        public async Task<ActionResult> AddToItems([FromForm] long rawItemId)
+        {
+            if (await _itemRepository.AddToItems(rawItemId))
+            {
+                return Ok();
+            }
+
+            return NotFound();
+        }
         
+        [HttpGet]
+        [Route("getAllNotApproved")]
+        public async Task<ActionResult<ResultPage<RawItem>>> GetAllNotApproved([FromQuery]int offset, int limit)
+        {
+            return await _itemRepository.GetAllNotApproved(offset, limit);
+        }
+
         [HttpGet]
         [Route("getSaleItems")]
         public async Task<ActionResult<IList<Item>>> GetSaleItems()

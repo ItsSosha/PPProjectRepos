@@ -28,11 +28,37 @@ public class ItemRepository : IItemRepository
         return false;
     }
 
+    public async Task<bool> AddToItems(long rawItemId)
+    {
+        if (_db.Items.All(x => x.RawItemId != rawItemId))
+        {
+            RawItem rawItem = await _db.RawItems.FindAsync(rawItemId);
+
+            Item item = new Item()
+            {
+                RawItem = rawItem,
+                RawItemId = rawItemId,
+            };
+
+            _db.Items.Add(item);
+            _db.SaveChangesAsync();
+            return true;
+        }
+
+        return false;
+    }
+
     public async Task<ResultPage<Item>> GetAll(int offset, int limit)
     {
         return await GenericPaginator.Paginate(_db.Items
             .Include(i => i.RawItem)
             .ThenInclude(c => c.RawCategory), offset, limit);
+    }
+
+    public async Task<ResultPage<RawItem>> GetAllNotApproved(int offset, int limit)
+    {
+        return await GenericPaginator.Paginate(_db.RawItems
+            .Where(ri => !_db.Items.Any(i => i.RawItemId == ri.Id)), offset, limit);
     }
 
     public async Task<IList<Item>> GetAllSale()
@@ -64,13 +90,21 @@ public class ItemRepository : IItemRepository
         var itemsLength = _db.RawItems.Count();
         var startIndex = random.Next(itemsLength - 5);
 
-
         return await _db.Items
             .Include(ri => ri.RawItem)
             .Skip(startIndex)
             .Take(5)
             .Where(c => c.RawItem.RawCategory == item.RawItem.RawCategory)
             .ToListAsync();
+        
+        /*return await _db.Items
+            .Include(ri => ri.RawItem)
+            .ThenInclude(c => c.RawCategory)
+            .ThenInclude(c => c.Category)
+            .Skip(startIndex)
+            .Take(5)
+            .Where(c => c.RawItem.RawCategory.Category == item.RawItem.RawCategory.Category)
+            .ToListAsync();*/
     }
 
     public async Task<Item?> GetByIdAsync(long id)
@@ -83,8 +117,10 @@ public class ItemRepository : IItemRepository
 
         var rawItem = await _db.RawItems.FirstOrDefaultAsync(x => x.Id == item.RawItemId);
         var rawCategory = await _db.RawCategories.FirstOrDefaultAsync(x => x.Id == rawItem.RawCategoryId);
+        //var category = await _db.Categories.FirstOrDefaultAsync(x => x.Id == rawCategory.Category.Id);
         var store = await _db.Stores.FirstOrDefaultAsync(x => x.Id == rawCategory.StoreId);
 
+        //rawCategory.Category = category;
         rawCategory.Store = store;
         rawItem.RawCategory = rawCategory;
 
@@ -108,6 +144,29 @@ public class ItemRepository : IItemRepository
         return item;
     }
 
+    public async Task<RawItem?> GetRawItemById(long id)
+    {
+        var rawItem = await _db.RawItems.FindAsync(id);
+        var rawCategory = await _db.RawCategories.FirstOrDefaultAsync(x => x.Id == rawItem.RawCategoryId);
+        //var category = await _db.Categories.FirstOrDefaultAsync(x => x.Id == rawCategory.Category.Id);
+        var store = await _db.Stores.FirstOrDefaultAsync(x => x.Id == rawCategory.StoreId);
+
+        //rawCategory.Category = category;
+        rawCategory.Store = store;
+        rawItem.RawCategory = rawCategory;
+
+        var specifications = await _db.Specifications
+            .Where(x=> x.RawItemId == rawItem.Id)
+            .Select(x => x)
+            .ToListAsync();
+
+        rawItem.Specifications = specifications;
+
+        specifications.ForEach(x => x.RawItem = null);
+
+        return rawItem;
+    }
+
     public async Task<List<PriceHistory>> GetPriceHistory(long id)
     {
         Item item = _db.Items.Find(id);
@@ -128,6 +187,15 @@ public class ItemRepository : IItemRepository
 
     public async Task<ResultPage<Item>> GetItemsByCategory(string categoryName, int priceFrom, int priceTo, bool isOnSale, bool isFoxtrot, bool isRozetka, int offset, int limit)
     {
+        /*var query = _db.Items
+            .Include(i => i.RawItem)
+            .ThenInclude(c => c.RawCategory)
+            .ThenInclude(rc => rc.Category)
+            .Include(i => i.RawItem)
+            .ThenInclude(c => c.RawCategory)
+            .ThenInclude(rc => rc.Store)
+            .Where(c => c.RawItem.RawCategory.Category.Name == categoryName);*/
+        
         var query = _db.Items
             .Include(i => i.RawItem)
             .ThenInclude(c => c.RawCategory)
@@ -169,6 +237,16 @@ public class ItemRepository : IItemRepository
     
     public async Task<ResultPage<Item>> GetItemsBySearch(string searchResult, int priceFrom, int priceTo, bool isOnSale, bool isFoxtrot, bool isRozetka, int offset, int limit)
     {
+        /*var query = _db.Items
+            .Include(i => i.RawItem)
+            .ThenInclude(c => c.RawCategory)
+            .ThenInclude(rc => rc.Category)
+            .Include(i => i.RawItem)
+            .ThenInclude(c => c.RawCategory)
+            .ThenInclude(rc => rc.Store)
+            .Where((c => c.RawItem.Name.ToLower().Contains(searchResult.ToLower()) || 
+                        c.RawItem.Description.ToLower().Contains(searchResult.ToLower())));*/
+        
         var query = _db.Items
             .Include(i => i.RawItem)
             .ThenInclude(c => c.RawCategory)

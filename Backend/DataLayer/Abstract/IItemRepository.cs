@@ -6,7 +6,11 @@ public interface IItemRepository
 {
     public Task<bool> AddReview(Review review, long id);
 
+    public Task<bool> AddToItems(long rawItemId);
+
     public Task<ResultPage<Item>> GetAll(int offset, int limit);
+    
+    public Task<ResultPage<RawItem>> GetAllNotApproved(int offset, int limit);
     
     public Task<IList<Item>> GetAllSale();
     
@@ -15,6 +19,8 @@ public interface IItemRepository
     public Task<IList<Item>> GetRecommended(Item item);
     
     public Task<Item> GetByIdAsync(long id);
+    
+    public Task<RawItem> GetRawItemById(long id);
     
     public Task<List<PriceHistory>> GetPriceHistory(long id);
     
