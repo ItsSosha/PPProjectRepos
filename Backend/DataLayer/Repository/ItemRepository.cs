@@ -67,20 +67,20 @@ public class ItemRepository : IItemRepository
             .Include(i => i.RawItem)
             .ThenInclude(c => c.RawCategory)
             .Where(ri => ri.RawItem.IsOnSale == true)
-            .Take(10)
+            .Take(5)
             .ToListAsync();
     }
 
     public async Task<IList<Item>> GetAllNew()
     {
         var totalItems = await _db.Items.CountAsync();
-        var startIndex = Math.Max(totalItems - 10, 0);
+        var startIndex = Math.Max(totalItems - 5, 0);
 
         return await _db.Items
             .Include(i => i.RawItem)
             .ThenInclude(c => c.RawCategory)
             .Skip(startIndex)
-            .Take(10)
+            .Take(5)
             .ToListAsync();
     }
 
