@@ -26,7 +26,7 @@ namespace BackendAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Item>> GetById([FromQuery] string jwt, long id)
+        public async Task<ActionResult<Item>> GetById([FromQuery] long id, string jwt = "")
         {
             Item item = await _itemRepository.GetByIdAsync(id);
             if (item != null)
@@ -36,10 +36,6 @@ namespace BackendAPI.Controllers
                 if (user != null &&  await _subscriptionRepository.IsUserPremium(user))
                 {
                     item.PriceHistories = await _itemRepository.GetPriceHistory(id);
-                }
-                else
-                {
-                    return Unauthorized();
                 }
 
                 return Ok(item);
@@ -95,8 +91,15 @@ namespace BackendAPI.Controllers
 
         [HttpPost]
         [Route("addToItems")]
-        public async Task<ActionResult> AddToItems([FromForm] long rawItemId)
+        public async Task<ActionResult> AddToItems([FromForm] string jwt, long rawItemId)
         {
+            var user = await _userRepository.GetOrRegisterUser(jwt);
+
+            if (user?.IsAdmin != true)
+            {
+                return Unauthorized();
+            }
+            
             if (await _itemRepository.AddToItems(rawItemId))
             {
                 return Ok();
@@ -107,8 +110,15 @@ namespace BackendAPI.Controllers
         
         [HttpGet]
         [Route("getAllNotApproved")]
-        public async Task<ActionResult<ResultPage<RawItem>>> GetAllNotApproved([FromQuery]int offset, int limit)
+        public async Task<ActionResult<ResultPage<RawItem>>> GetAllNotApproved([FromQuery]string jwt, int offset, int limit)
         {
+            var user = await _userRepository.GetOrRegisterUser(jwt);
+
+            if (user?.IsAdmin != true)
+            {
+                return Unauthorized();
+            }
+            
             return await _itemRepository.GetAllNotApproved(offset, limit);
         }
 
