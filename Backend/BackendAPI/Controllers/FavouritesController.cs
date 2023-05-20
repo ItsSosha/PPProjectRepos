@@ -103,5 +103,18 @@ namespace BackendAPI.Controllers
 
             return Ok();
         }
+
+        [HttpGet]
+        [Route("isOnFavourites")]
+        public async Task<ActionResult<bool>> IsOnFavourites([FromQuery] string jwt, long itemId)
+        {
+            var user = await _userRepository.GetOrRegisterUser(jwt);
+            if (user == null)
+            {
+                return false;
+            }
+
+            return user.Favourites.Any(x => x.Item.Id == itemId);
+        }
     }
 }

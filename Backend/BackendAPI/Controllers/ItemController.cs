@@ -1,4 +1,5 @@
-﻿using Core;
+﻿using System.ComponentModel;
+using Core;
 using Microsoft.AspNetCore.Mvc;
 using DataLayer.Abstract;
 
@@ -10,35 +11,33 @@ namespace BackendAPI.Controllers
     {
         private readonly IItemRepository _itemRepository;
         private readonly IUserRepository _userRepository;
+        private readonly ISubscriptionRepository _subscriptionRepository;
 
-        public ItemController(IItemRepository itemRepository, IUserRepository userRepository)
+        public ItemController(IItemRepository itemRepository, IUserRepository userRepository, ISubscriptionRepository subscriptionRepository)
         {
             _itemRepository = itemRepository;
             _userRepository = userRepository;
+            _subscriptionRepository = subscriptionRepository;
         }
 
         [HttpGet]
-        public async Task<ActionResult<ResultPage<Item>>> GetAll([FromQuery]int offset, int limit)
+        public async Task<ActionResult<ResultPage<Item>>> GetAll(int offset, int limit)
         {
             return await _itemRepository.GetAll(offset, limit);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Item>> GetById([FromQuery] long userId, long id)
+        public async Task<ActionResult<Item>> GetById(long id, string? jwt = null)
         {
             Item item = await _itemRepository.GetByIdAsync(id);
             if (item != null)
             {
-                User user = await _userRepository.GetById(userId);
+                User user = await _userRepository.GetOrRegisterUser(jwt ?? "uihfjhbf");
 
-                /*if (user != null && user.IsPremium())
+                if (user != null &&  await _subscriptionRepository.IsUserPremium(user))
                 {
                     item.PriceHistories = await _itemRepository.GetPriceHistory(id);
                 }
-                else
-                {
-                    return Unauthorized();
-                }*/
 
                 return Ok(item);
             }
@@ -46,23 +45,84 @@ namespace BackendAPI.Controllers
             return NotFound();
         }
         
-        [HttpPost]
-        public async Task<ActionResult> AddReview([FromForm] string jwt, long id, Review review) 
+        [HttpGet]
+        [Route("getRawItemById")]
+        public async Task<ActionResult<RawItem?>> GetRawItemById([FromQuery] string jwt, long id)
         {
-            if (review != null)
+            User user = await _userRepository.GetOrRegisterUser(jwt);
+
+            if (user.IsAdmin)
             {
-                var user = await _userRepository.GetOrRegisterUser(jwt);
-                if (user != null)
+                var rawItem = await _itemRepository.GetRawItemById(id);
+                if (rawItem != null)
                 {
-                    bool isAdded = await _itemRepository.AddReview(review, id, user);
+                    return Ok(rawItem);
                 }
-
-                return Unauthorized();
+                else
+                {
+                    return NotFound();
+                }
             }
-
-            return BadRequest(); //maybe
+            
+            return Unauthorized(); // ?? 
         }
         
+        [HttpPost]
+        public async Task<ActionResult> AddReview([FromForm] string jwt, long id, string reviewText, int rating) 
+        {
+
+            var user = await _userRepository.GetOrRegisterUser(jwt);
+            
+            if (user != null)
+            {
+                Review review = new Review()
+                {
+                    Grade = rating,
+                    ReviewText = reviewText,
+                    ItemId = id, // ??
+                    User = user,
+                };
+                
+                bool isAdded = await _itemRepository.AddReview(review, id);
+            }
+
+            return Unauthorized();
+
+        }
+
+        [HttpPost]
+        [Route("addToItems")]
+        public async Task<ActionResult> AddToItems([FromForm] string jwt, long rawItemId)
+        {
+            var user = await _userRepository.GetOrRegisterUser(jwt);
+
+            if (user?.IsAdmin != true)
+            {
+                return Unauthorized();
+            }
+            
+            if (await _itemRepository.AddToItems(rawItemId))
+            {
+                return Ok();
+            }
+
+            return NotFound();
+        }
+        
+        [HttpGet]
+        [Route("getAllNotApproved")]
+        public async Task<ActionResult<ResultPage<RawItem>>> GetAllNotApproved([FromQuery]string jwt, int offset, int limit)
+        {
+            var user = await _userRepository.GetOrRegisterUser(jwt);
+
+            if (user?.IsAdmin != true)
+            {
+                return Unauthorized();
+            }
+            
+            return await _itemRepository.GetAllNotApproved(offset, limit);
+        }
+
         [HttpGet]
         [Route("getSaleItems")]
         public async Task<ActionResult<IList<Item>>> GetSaleItems()
@@ -79,9 +139,9 @@ namespace BackendAPI.Controllers
             return Ok(items);
         }
         
-        [HttpGet("{id}")]
+        [HttpGet]
         [Route("getRecommended")]
-        public async Task<ActionResult<IList<Item>>> GetRecommended(long id)
+        public async Task<ActionResult<IList<Item>>> GetRecommended([FromQuery]long id)
         {
             var item = await _itemRepository.GetByIdAsync(id);
             if (item != null)
@@ -92,6 +152,32 @@ namespace BackendAPI.Controllers
                     return Ok(recommendedItems);
                 }
                 return NotFound();
+            }
+
+            return NotFound();
+        }
+
+        [HttpGet]
+        [Route("filterByCategory")]
+        public async Task<ActionResult<ResultPage<Item>>> GetItemsByCategory([FromQuery] string categoryName, int priceFrom, int PriceTo, bool isOnSale, bool isFoxtrot, bool isRozetka, int offset, int limit)
+        {
+            var filteredItems = await _itemRepository.GetItemsByCategory(categoryName, priceFrom, PriceTo, isOnSale, isFoxtrot, isRozetka, offset, limit);
+            
+            if (filteredItems != null)
+            {
+                return Ok(filteredItems);
+            }
+
+            return NotFound();
+        }
+        [HttpGet]
+        [Route("searchByName")]
+        public async Task<ActionResult<ResultPage<Item>>> GetItemsBySearch([FromQuery] string searchResult, int priceFrom, int PriceTo, bool isOnSale, bool isFoxtrot, bool isRozetka, int offset, int limit)
+        {
+            var items = await _itemRepository.GetItemsBySearch(searchResult, priceFrom, PriceTo, isOnSale, isFoxtrot, isRozetka, offset, limit);
+            if (items != null)
+            {
+                return Ok(items);
             }
 
             return NotFound();
