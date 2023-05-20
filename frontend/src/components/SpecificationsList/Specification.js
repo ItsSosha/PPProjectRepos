@@ -27,7 +27,7 @@ const Specification = ({spec}) => {
                         zIndex: 1,
                         pr: "16px",
                     }}>
-                    {spec.Key}
+                    {spec.key}
                 </Typography>
                 <DottedFiller />
             </Box>
@@ -37,7 +37,7 @@ const Specification = ({spec}) => {
                     zIndex: 0
                 }}
                 variant="body2">
-                {spec.Value}
+                {spec.value}
             </Typography>
         </>
     )

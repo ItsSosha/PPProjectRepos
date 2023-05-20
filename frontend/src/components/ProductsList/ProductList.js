@@ -13,15 +13,15 @@ const ProductsListWrapper = styled.div`
 
 const ProductsList = ({data, itemsPerRow, page = 1, rows = 1}) => {
 
-    const displayData = useMemo(() => {
-        return data.slice(itemsPerRow * rows * (page - 1), itemsPerRow * rows * page);
-        // eslint-disable-next-line
-    }, [page, data]);
+    // const displayData = useMemo(() => {
+    //     return data.slice(itemsPerRow * rows * (page - 1), itemsPerRow * rows * page);
+    //     // eslint-disable-next-line
+    // }, [page, data]);
 
     return (
         <ProductsListWrapper itemsPerRow={itemsPerRow}>
-            {displayData.map(item => {
-                return <ProductCard data={item} key={item.Id}/>
+            {data.map(item => {
+                return <ProductCard data={item} key={item.id}/>
             })}
         </ProductsListWrapper>
     )

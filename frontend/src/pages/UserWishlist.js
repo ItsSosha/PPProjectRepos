@@ -4,9 +4,11 @@ import {
   Pagination,
   Stack,
   Typography,
+  CircularProgress
 } from "@mui/material";
 import ProductsList from "../components/ProductsList/ProductList";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAuthContext } from "../auth/auth";
 
 const dummyData = [
   {
@@ -54,11 +56,25 @@ const dummyData = [
 const PER_ROW = 4;
 const ROWS = 2;
 
+const fetchUserFavourites = async id => {
+  const response = await fetch(`https://pricely.tech/api/Favourites?userId=${id}`);
+  return await response.json();
+}
 
 const UserWishlist = (props) => {
-  const [favourites, setFavourites] = useState(dummyData);
+  const [favourites, setFavourites] = useState([]);
   const [page, setPage] = useState(1);
+  const [loading , setLoading] = useState(true);
+  const { user } = useAuthContext();
 
+  useEffect(() => {
+    if (user) {
+      fetchUserFavourites(user.id).then(data => {
+        setFavourites(data);
+        setLoading(false);
+      })
+    }
+  }, [])
 
   return (
     <>
@@ -99,11 +115,14 @@ const UserWishlist = (props) => {
           />
         </Stack>
         </> :
+        loading ?
+        <CircularProgress color="secondary" size={80}/> :
         <Typography variant="h4">
-          На даний момент ваш кошик пустий
+          На даний момент ваш список бажань пустий
         </Typography>}
     </>
   )
 };
+
 
 export default UserWishlist;
