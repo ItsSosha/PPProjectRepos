@@ -6,14 +6,14 @@ const RootLayout = (props) => {
   return (
     <Drawer drawerContent={props => <CustomDrawer {...props} />}>
       <Drawer.Screen
-        name="index"
+        name="users/[id]/about"
         options={{
           drawerLabel: "Your profile",
           title: "Your profile"
         }}
       />
       <Drawer.Screen
-        name="wishlist"
+        name="users/[id]/wishlist"
         options={{
           drawerLabel: "Wishlist",
           title: "Wishlist"

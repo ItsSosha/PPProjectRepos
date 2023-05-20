@@ -1,9 +1,9 @@
 import { Link } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, Pressable, View } from "react-native";
-import ProductList from "../../src/components/ProductList/ProductList"
+import ProductList from "../../../../src/components/ProductList/ProductList";
 import { ScrollView } from "react-native-gesture-handler";
-import productsData from "../../src/utils/productData"
+import productsData from "../../../../src/utils/productData";
 import { useState } from "react";
 import { TouchableOpacity } from "react-native-gesture-handler";
 const styles = StyleSheet.create({
