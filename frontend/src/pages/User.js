@@ -32,10 +32,7 @@ const User = (props) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    document.cookie = `firstName=; max-age=-1;`;
-    document.cookie = `lastName=; max-age=-1;`;
-    document.cookie = `email=; max-age=-1;`;
-    document.cookie = `profilePictureURL=; max-age=-1;`;
+    document.cookie = `jwt=; max-age=-1;`;
 
     logout();
     navigate('/');

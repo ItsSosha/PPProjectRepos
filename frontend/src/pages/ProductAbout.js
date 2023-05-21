@@ -23,7 +23,6 @@ const IS_USER_PREMIUM = true;
 
 const ProductAbout = () => {
   const { product } = useOutletContext();
-
   return (
     <AboutWrapper>
       <Typography
@@ -34,7 +33,7 @@ const ProductAbout = () => {
         }}>
         Характеристики
       </Typography>
-      <SpecificationsList specs={product.Specifications}/>
+      <SpecificationsList specs={product.rawItem.specifications}/>
       <Typography
         variant="h5"
         component="h5"
@@ -45,7 +44,7 @@ const ProductAbout = () => {
         Динаміка цін
       </Typography>
       
-      {(!IS_USER_PREMIUM) 
+      {(!product.priceHistories) 
       ? <Paper
         sx={{
           display: "flex",
@@ -66,7 +65,7 @@ const ProductAbout = () => {
         width: "100%",
         height: "100%",
       }}>
-        <PriceHistoryChart data={samplePriceHistory}/>
+        <PriceHistoryChart data={product.priceHistories}/>
       </Box>}
     </AboutWrapper>
   )

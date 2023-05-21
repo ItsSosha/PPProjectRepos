@@ -23,8 +23,7 @@ img {
 }
 `
 
-const ProductCardLg = ({ product, onFavouriteChange }) => {
-
+const ProductCardLg = ({ product, onFavouriteChange, isFavourited, isLoggedIn }) => {
   return (
     <Card
       sx={{
@@ -36,14 +35,14 @@ const ProductCardLg = ({ product, onFavouriteChange }) => {
           sx={{
             objectFit: "contain",
           }}
-          image={product.RawIconURL}
-          alt={product.Name}>
+          image={product.rawIconURL}
+          alt={product.name}>
       </CardMedia>
       <CardContent>
         <Typography
           variant="h5"
           component="h5">
-            {product.Name}
+            {product.name}
         </Typography>
         <CardInfoRow>
           <Typography
@@ -51,9 +50,9 @@ const ProductCardLg = ({ product, onFavouriteChange }) => {
             component="p"
             color="secondary"
             align="right">
-            {product.RawPrice}₴&nbsp;{product.IsOnSale ? <Typography sx={{textDecoration: "line-through"}} component="span">{product.OldPrice}₴</Typography> : null }
+            {product.rawPrice}₴&nbsp;{product.isOnSale ? <Typography sx={{textDecoration: "line-through"}} component="span">{product.oldPrice}₴</Typography> : null }
           </Typography>
-          <img src={product.VendorIcon} alt="Product vendor icon"/>
+          <img src={product.rawCategory.store.iconURL} alt="Product vendor icon"/>
         </CardInfoRow>
       </CardContent>
       <CardActions sx={{mb: 1, columnGap: 2}}>
@@ -64,13 +63,14 @@ const ProductCardLg = ({ product, onFavouriteChange }) => {
             flex: "1 0 0", 
             color: "primary.main",
           }}
-          href="#">
+          href={product.rawItemURL}>
             <ShoppingCartRounded />
             <Typography 
               sx={{ml: 1, textTransform: "none"}}>До магазину</Typography>
         </Button>
         <Button
-          color={product.isFavourited ? "secondary" : "disabled"}
+          disabled={isLoggedIn ? false : true }
+          color={isFavourited ? "secondary" : "disabled"}
           variant="outlined"
           sx={{
             borderWidth: "2px",
@@ -79,11 +79,11 @@ const ProductCardLg = ({ product, onFavouriteChange }) => {
             }
           }}
           onClick={onFavouriteChange}>
-          {product.isFavourited ? <StarRounded /> : <StarBorderRounded/>}
+          {isFavourited ? <StarRounded /> : <StarBorderRounded/>}
         </Button>
       </CardActions>
     </Card>
   );
 };
-
+// isFavourited
 export default ProductCardLg;

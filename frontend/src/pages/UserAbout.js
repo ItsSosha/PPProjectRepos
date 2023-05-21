@@ -9,16 +9,8 @@ import { useAuthContext } from "../auth/auth";
 
 import FormField from "../components/FormField";
 
-// const user = {
-//   name: "Shark",
-//   surname: "Fishers",
-//   email: "shark@ocean.bul",
-//   isPremium: false,
-// }
-
 const UserAbout = (props) => {
   const { user } = useAuthContext();
-  console.log(user);
   return (
     <>
       <Typography variant="h4" fontWeight="700">
@@ -46,7 +38,6 @@ const UserAbout = (props) => {
         <Grid item xs={4}>
           <Box display="flex" alignItems="center" height="100%">
             <img
-              // src="https://lh3.googleusercontent.com/ogw/AOLn63HMIWZpv0of2VYV5NFGSQlWW5BU6GmdSx2OZOnBJA=s256-c-mo"
               src={user.profilePictureURL}
               alt="profile"
               style={{ borderRadius: "50%", scale: "1.2" }}
