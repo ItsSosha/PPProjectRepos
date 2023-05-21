@@ -32,5 +32,23 @@ namespace BackendAPI.Controllers
 
             return user;
         }
+
+        [HttpPost]
+        [Route("setNotificationToken")]
+        public async Task<ActionResult> SetNotificationToken([FromBody] string jwt, string token)
+        {
+            var user = await _userRepository.GetOrRegisterUser(jwt);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            if (await _userRepository.SetNotificationToken(user, token))
+            {
+                return Ok();
+            }
+
+            return NotFound();
+        }
     }
 }

@@ -68,7 +68,8 @@ namespace BackendAPI.Controllers
         }
         
         [HttpPost]
-        public async Task<ActionResult> AddReview([FromForm] string jwt, long id, string reviewText, int rating) 
+        [Route("addReview")]
+        public async Task<ActionResult> AddReview([FromBody] string jwt, long id, string reviewText, int rating) 
         {
 
             var user = await _userRepository.GetOrRegisterUser(jwt);
@@ -92,7 +93,7 @@ namespace BackendAPI.Controllers
 
         [HttpPost]
         [Route("addToItems")]
-        public async Task<ActionResult> AddToItems([FromForm] string jwt, long rawItemId)
+        public async Task<ActionResult> AddToItems([FromBody] string jwt, long rawItemId)
         {
             var user = await _userRepository.GetOrRegisterUser(jwt);
 
@@ -159,9 +160,9 @@ namespace BackendAPI.Controllers
 
         [HttpGet]
         [Route("filterByCategory")]
-        public async Task<ActionResult<ResultPage<Item>>> GetItemsByCategory([FromQuery] string categoryName, int priceFrom, int PriceTo, bool isOnSale, bool isFoxtrot, bool isRozetka, int offset, int limit)
+        public async Task<ActionResult<ResultPage<Item>>> GetItemsByCategory([FromQuery] string categoryName, int priceFrom, int priceTo, bool isOnSale, bool isFoxtrot, bool isRozetka, int offset, int limit)
         {
-            var filteredItems = await _itemRepository.GetItemsByCategory(categoryName, priceFrom, PriceTo, isOnSale, isFoxtrot, isRozetka, offset, limit);
+            var filteredItems = await _itemRepository.GetItemsByCategory(categoryName, priceFrom, priceTo, isOnSale, isFoxtrot, isRozetka, offset, limit);
             
             if (filteredItems != null)
             {
@@ -172,9 +173,9 @@ namespace BackendAPI.Controllers
         }
         [HttpGet]
         [Route("searchByName")]
-        public async Task<ActionResult<ResultPage<Item>>> GetItemsBySearch([FromQuery] string searchResult, int priceFrom, int PriceTo, bool isOnSale, bool isFoxtrot, bool isRozetka, int offset, int limit)
+        public async Task<ActionResult<ResultPage<Item>>> GetItemsBySearch([FromQuery] string searchResult, int priceFrom, int priceTo, bool isOnSale, bool isFoxtrot, bool isRozetka, int offset, int limit)
         {
-            var items = await _itemRepository.GetItemsBySearch(searchResult, priceFrom, PriceTo, isOnSale, isFoxtrot, isRozetka, offset, limit);
+            var items = await _itemRepository.GetItemsBySearch(searchResult, priceFrom, priceTo, isOnSale, isFoxtrot, isRozetka, offset, limit);
             if (items != null)
             {
                 return Ok(items);
