@@ -36,7 +36,6 @@ public class ItemRepository : IItemRepository
 
             Item item = new Item()
             {
-                RawItem = rawItem,
                 RawItemId = rawItemId,
             };
 
@@ -137,8 +136,7 @@ public class ItemRepository : IItemRepository
         rawItem.Specifications = specifications;
         item.RawItem = rawItem;
         item.Reviews = reviews;
-
-        specifications.ForEach(x => x.RawItem = null);
+        
         reviews.ForEach(x => x.Item = null);
 
         return item;
@@ -161,8 +159,6 @@ public class ItemRepository : IItemRepository
             .ToListAsync();
 
         rawItem.Specifications = specifications;
-
-        specifications.ForEach(x => x.RawItem = null);
 
         return rawItem;
     }

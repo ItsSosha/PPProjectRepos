@@ -49,7 +49,7 @@ namespace BackendAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post([FromForm] string jwt, long itemId)
+        public async Task<ActionResult> Post([FromBody] string jwt, long itemId)
         {
             var user = await _userRepository.GetOrRegisterUser(jwt);
             if (user == null)
@@ -68,7 +68,7 @@ namespace BackendAPI.Controllers
         }
         
         [HttpDelete]
-        public async Task<ActionResult> Delete([FromForm] string jwt, long itemId)
+        public async Task<ActionResult> Delete([FromBody] string jwt, long itemId)
         {
             var user = await _userRepository.GetOrRegisterUser(jwt);
             if (user == null)
@@ -88,7 +88,7 @@ namespace BackendAPI.Controllers
         
         [HttpDelete]
         [Route("deleteAll")]
-        public async Task<ActionResult> DeleteAll([FromForm] string jwt)
+        public async Task<ActionResult> DeleteAll([FromBody] string jwt)
         {
             var user = await _userRepository.GetOrRegisterUser(jwt);
             if (user == null)
@@ -109,12 +109,13 @@ namespace BackendAPI.Controllers
         public async Task<ActionResult<bool>> IsOnFavourites([FromQuery] string jwt, long itemId)
         {
             var user = await _userRepository.GetOrRegisterUser(jwt);
-            if (user == null)
+            var item = await _itemRepository.GetByIdAsync(itemId);
+            if (user == null || item == null)
             {
                 return false;
             }
 
-            return user.Favourites.Any(x => x.Item.Id == itemId);
+            return await _userRepository.IsOnFavourites(user, item);
         }
     }
 }
