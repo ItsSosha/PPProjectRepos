@@ -5,8 +5,10 @@ import {
 import { useParams, Outlet, NavLink } from "react-router-dom";
 import styled from "styled-components";
 import ProductCardLg from "../components/ProductCardLg";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ProductList from "../components/ProductsList/ProductList"
+import { CircularProgress } from "@mui/material";
+import { useAuthContext } from "../auth/auth";
 
 const dummyData = [
   {
@@ -91,7 +93,7 @@ const ProductContent = styled.div`
 
 const CardSection = styled.div`
   padding: 20px;
-  align-self: center;
+  align-self: flex-start;
 `;
 
 const ButtonNavLink = ({to, text}) => {
@@ -114,24 +116,66 @@ const ButtonNavLink = ({to, text}) => {
   )
 }
 
+const fetchProduct = async (id, jwt) => {
+  const response = await fetch(`https://pricely.tech/api/Item/${id}?jwt=${jwt}`);
+  return await response.json();
+}
+
+const fetchRecommended = async id => {
+  const response = await fetch(`https://pricely.tech/api/Item/getRecommended?id=${id}`);
+  return await response.json();
+}
+
+const fetchFavouritedState = async (id, jwt) => {
+  const response = await fetch(`https://pricely.tech/api/Favourites/isOnFavourites?id=${id}&jwt=${jwt}`);
+  return await response.json();
+
+}
+
 const Product = () => {
   const { id } = useParams();
+  const { user } = useAuthContext();
+  const [product, setProduct] = useState(null);
+  const [isFavourited, setIsFavourited] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [recommended, setRecommended] = useState(null);
 
-  const [product, setProduct] = useState(dummyData[id]);
+
+  useEffect(() => {
+    fetchProduct(id, user?.jwt).then(data => {
+      setProduct(data);
+      const recommendedPromise = fetchRecommended(data.id).then(recommendedData => {
+        setRecommended(recommendedData);
+      })
+
+      const favouritedPromise = fetchFavouritedState(id, user?.jwt).then(setIsFavourited);
+
+      Promise.all([recommendedPromise, favouritedPromise]).then(() => {
+        setLoading(false);
+      });
+    });
+  }, [user])
 
   const handleFavouriteChange = () => {
-    setProduct(prevProduct => ({
-      ...prevProduct,
-      isFavourited: !prevProduct.isFavourited
-    }))
+    setIsFavourited(prevState => !prevState);
   }
 
+  return (
+    <>
+      {loading ? 
+      <CircularProgress color="secondary" size={80}/> : 
+      <View product={product} isFavourited={isFavourited} user={user} recommended={recommended} handleFavouriteChange={handleFavouriteChange}/>}
+    </>
+  );
+};
+
+const View = ({product, handleFavouriteChange, isFavourited, user, recommended}) => {
   return (
     <ProductWrapper>
       <Typography
           variant="h5"
           component="h5">
-          {product.Name}
+          {product.rawItem.name}
       </Typography>
       <ButtonsWrapper>
         <ButtonNavLink to="about" text="Про товар" />
@@ -140,7 +184,7 @@ const Product = () => {
       <ProductContent>
         <Outlet context={{ product }}/>
         <CardSection>
-          <ProductCardLg product={product} onFavouriteChange={handleFavouriteChange}/>
+          <ProductCardLg isLoggedIn={!!user} product={product.rawItem} isFavourited={isFavourited} onFavouriteChange={handleFavouriteChange}/>
         </CardSection>
       </ProductContent>
       <Typography
@@ -152,9 +196,9 @@ const Product = () => {
           }}>
           Рекомендовані товари
       </Typography>
-      <ProductList itemsPerRow={5} data={dummyData}/>
+      <ProductList itemsPerRow={5} data={recommended}/>
     </ProductWrapper>
-  );
-};
+  )
+}
 
 export default Product;

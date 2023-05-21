@@ -33,12 +33,12 @@ const styles = StyleSheet.create({
     }
 });
 
-const ProductCard = ({product}) => {
+const ProductCard = ({product, fullHeight}) => {
     return (
         <Card>
             <Image style={styles.cardImage} source={{uri: product.rawIconURL}}/>
             <View style={styles.cardContent}>
-                <InterText style={styles.cardTitle} numberOfLines={3}>{product.name}</InterText>
+                <InterText style={styles.cardTitle} numberOfLines={fullHeight ? 0 : 3}>{product.name}</InterText>
                 <View style={styles.cardPrice}>
                     <ManropeText style={styles.cardPriceCurrent}>{product.rawPrice}₴</ManropeText>
                     {product.oldPrice ? <ManropeText style={styles.cardPriceOld}>{product.oldPrice}₴</ManropeText> : null}

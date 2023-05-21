@@ -4,7 +4,6 @@ import { Outlet, Navigate } from "react-router";
 const AdminRoutes = () => {
 
     const { user } = useAuthContext();
-    console.log(user);
 
     return (
         <>

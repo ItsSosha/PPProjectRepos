@@ -14,7 +14,7 @@ const ProductCard = ({data}) => {
         boxShadow: '0 4px 24px rgba(123, 123, 123, 0.15)'}}>
       <CardActionArea
         component={Link}
-        to={`/products/${data.Id}/about`}>
+        to={`/products/${data.id}/about`}>
         <CardMedia
           component="img"
           sx={{
@@ -22,8 +22,8 @@ const ProductCard = ({data}) => {
             objectFit: "contain",
             padding: "1em"
           }}
-          image={data.RawIconURL}
-          alt={data.Name}>
+          image={data.rawItem.rawIconURL}
+          alt={data.rawItem.name}>
         </CardMedia>
         <CardContent>
           <Typography
@@ -34,16 +34,17 @@ const ProductCard = ({data}) => {
               textOverflow: 'ellipsis',
               display: '-webkit-box',
               WebkitLineClamp: '3',
-              WebkitBoxOrient: 'vertical'
+              WebkitBoxOrient: 'vertical',
+              minHeight: '5em'
             }}>
-            {data.Name}
+            {data.rawItem.name}
           </Typography>
           <Typography
             variant="price"
             component="p"
             color="secondary"
             align="right">
-            {data.RawPrice}₴&nbsp;{data.IsOnSale ? <Typography sx={{textDecoration: "line-through"}} component="span">{data.OldPrice}₴</Typography> : null }
+            {data.rawItem.rawPrice}₴&nbsp;{data.rawItem.isOnSale ? <Typography sx={{textDecoration: "line-through"}} component="span">{data.rawItem.oldPrice}₴</Typography> : null }
           </Typography>
         </CardContent>
       </CardActionArea>

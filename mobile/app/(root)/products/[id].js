@@ -88,7 +88,7 @@ const ProductPage = ({route}) => {
 
     return (
         <ScrollView contentContainerStyle={{padding: 24, rowGap: 12}}>
-            <ProductCard product={product} />
+            <ProductCard product={product} fullHeight />
             <InterText style={{fontWeight: 'semibold', fontSize: 20, marginTop: 16}}>Характеристики</InterText>
             <Card>
                 <Specifications specifications={product.specifications} />
