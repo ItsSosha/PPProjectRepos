@@ -10,10 +10,9 @@ import {
 
 import { Refresh } from "@mui/icons-material";
 
-const Filters = ({ props }) => {
+const Filters = ({ onFilter, onParamsChange, values, onCheckChange }) => {
 
-  const vendors = ["Rozetka", "Citrus"];
-
+  const vendors = ["Rozetka", "Foxtrot"];
   return (
     <Box
       maxWidth="260px"
@@ -23,7 +22,7 @@ const Filters = ({ props }) => {
       borderRadius="5px"
       alignSelf="start"
     >
-      <form>
+      <form onSubmit={onFilter}>
         <Typography variant="h6" mb={2}>
           Ціна, &#8372;
         </Typography>
@@ -31,6 +30,10 @@ const Filters = ({ props }) => {
           Від
         </Typography>
         <TextField
+          name="priceFrom"
+          onChange={e => onParamsChange(e)}
+          value={values.priceFrom}
+          type="number"
           mb={1}
           variant="outlined"
           label="Введіть початкову ціну"
@@ -45,6 +48,10 @@ const Filters = ({ props }) => {
           До
         </Typography>
         <TextField
+          name="PriceTo"
+          onChange={e => onParamsChange(e)}
+          value={values.PriceTo}
+          type="number"
           mb={1}
           variant="outlined"
           label="Введіть кінцеву ціну"
@@ -58,13 +65,13 @@ const Filters = ({ props }) => {
         <Typography variant="h6" mb={0} mt={1}>
           Акційні товари
         </Typography>
-        <FormControlLabel control={<Checkbox color="secondary" />} label="Тільки акційні товари" />
+        <FormControlLabel name="isOnSale" onChange={onCheckChange} checked={values.isOnSale ? values.isOnSale : false} control={<Checkbox color="secondary" />} label="Тільки акційні товари" />
         <Typography variant="h6" mb={0} mt={1}>
           Продавець
         </Typography>
         <FormGroup>
         {vendors.map((vendor) => (
-          <FormControlLabel key={"checkbox" + vendor} control={<Checkbox color="secondary" />} label={vendor} />
+          <FormControlLabel key={"checkbox" + vendor} name={`is${vendor}`} onChange={onCheckChange} checked={values[`is${vendor}`] ? values[`is${vendor}`] : false} control={<Checkbox color="secondary" />} label={vendor} />
         ))}
         </FormGroup>
         <Box 

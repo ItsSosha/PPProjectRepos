@@ -13,8 +13,9 @@ import {
 
 import Logo from "./Logo";
 import { Person, Menu, StarOutlineRounded, Search } from "@mui/icons-material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, createSearchParams } from "react-router-dom";
 import { useAuthContext } from "../auth/auth";
+import { useState } from "react";
 
 const GridItemContainer = styled.div`
   display: flex;
@@ -23,8 +24,37 @@ const GridItemContainer = styled.div`
   column-gap: 8px;
 `;
 
+const Form = styled.form`
+width: 80%;
+`
+
 const Header = ({ handleSidebarClick, setLoginModalOpen }) => {
   const { user } = useAuthContext();
+  const [search, setSearch] = useState('');
+  const navigate = useNavigate();
+
+  const handleSubmit = e => {
+    e.preventDefault();
+    
+    if (!search) {
+      return;
+    }
+
+    const params = createSearchParams({
+      searchResult: search,
+      offset: 0
+    });
+
+    navigate({
+      pathname: "search",
+      search: `?${params}`,
+      
+    });
+
+    // navigate("search", {
+    //   s
+    // })
+  }
 
   return (
     <AppBar
@@ -52,19 +82,23 @@ const Header = ({ handleSidebarClick, setLoginModalOpen }) => {
             </Grid>
             <Grid item xs={7}>
               <GridItemContainer>
-                <TextField
-                variant="outlined"
-                label="Search"
-                size="small"
-                color="secondary"
-                sx={{
-                    width: '80%'
-                  }}
-                InputProps={{endAdornment: (
-                    <InputAdornment position="end">
-                      <Search />
-                    </InputAdornment>)}}>
-                </TextField>
+                <Form onSubmit={handleSubmit}>
+                  <TextField
+                  variant="outlined"
+                  label="Search"
+                  size="small"
+                  color="secondary"
+                  onChange={e => setSearch(e.target.value)}
+                  value={search}
+                  sx={{
+                      width: '100%'
+                    }}
+                  InputProps={{endAdornment: (
+                      <InputAdornment position="end">
+                        <Search />
+                      </InputAdornment>)}}>
+                  </TextField>
+                </Form>
               </GridItemContainer>
             </Grid>
             <Grid item xs={1}>

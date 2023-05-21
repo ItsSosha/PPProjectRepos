@@ -2,153 +2,118 @@ import styled from "styled-components";
 import Filters from "../components/Filters";
 import ProductsList from "../components/ProductsList/ProductList";
 import { useState } from "react";
-import { Stack, Pagination } from "@mui/material";
+import { Stack, Pagination, CircularProgress } from "@mui/material";
+import { createSearchParams, useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
 
 const SearchResultsWrapper = styled.div`
+  width: 100%;
   display: flex;
   column-gap: 32px;
 `;
 
-const dummyData = [
-  {
-    Id: 0,
-    Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
-    RawIconURL:
-      "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
-    VendorIcon: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/ROZETKA-Logo-L3-B-RGB.png/1200px-ROZETKA-Logo-L3-B-RGB.png",
-    RawPrice: 35999,
-    OldPrice: 39999,
-    IsOnSale: true,
-    Specifications: [
-      {
-        Key: 'Серия',
-        Value: 'TUF Gaming'
-      },
-      {
-        Key: 'Диагональ экрана',
-        Value: '"15.6" (1920x1080) Full HD'
-      },
-      {
-        Key: 'Тип экрана',
-        Value: 'IPS'
-      },
-    ]
-  },
-  {
-    Id: 1,
-    Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
-    RawIconURL:
-      "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
-    RawPrice: 35999,
-    OldPrice: 0,
-    IsOnSale: false,
-  },
-  {
-    Id: 2,
-    Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
-    RawIconURL:
-      "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
-    RawPrice: 35999,
-    OldPrice: 0,
-    IsOnSale: false,
-  },
-  {
-    Id: 3,
-    Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
-    RawIconURL:
-      "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
-    RawPrice: 35999,
-    OldPrice: 0,
-    IsOnSale: false,
-  },
-  {
-    Id: 4,
-    Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
-    RawIconURL:
-      "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
-    RawPrice: 35999,
-    OldPrice: 0,
-    IsOnSale: false,
-  },
-  {
-    Id: 5,
-    Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
-    RawIconURL:
-      "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
-    RawPrice: 35999,
-    OldPrice: 0,
-    IsOnSale: false,
-  },
-  {
-    Id: 6,
-    Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
-    RawIconURL:
-      "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
-    RawPrice: 35999,
-    OldPrice: 0,
-    IsOnSale: false,
-  },
-  {
-    Id: 7,
-    Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
-    RawIconURL:
-      "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
-    RawPrice: 35999,
-    OldPrice: 0,
-    IsOnSale: false,
-  },
-  {
-    Id: 8,
-    Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
-    RawIconURL:
-      "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
-    RawPrice: 35999,
-    OldPrice: 0,
-    IsOnSale: false,
-  },
-  {
-    Id: 9,
-    Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
-    RawIconURL:
-      "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
-    RawPrice: 35999,
-    OldPrice: 0,
-    IsOnSale: false,
-  },
-];
+const PER_ROW = 4;
+const PER_PAGE = 2;
 
-const PER_PAGE = 8;
+const fetchProducts = async (paramsObj) => {
+  const params = createSearchParams(paramsObj);
+  const response = await fetch(`https://pricely.tech/api/Item/searchByName?${params}`);
+  return response.json();
+}
+
 
 const SearchResults = () => {
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const [page, setPage] = useState(1);
+  const [params, setParams] = useState({});
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const searchObj = Object.fromEntries(searchParams.entries());
+
+    if (Object.entries(searchObj).length < 3) {
+      setParams({
+        searchResult: searchParams.get('searchResult') || null,
+        categoryName: searchParams.get('categoryName') || null,
+        priceFrom: searchParams.get('priceFrom') || '',
+        PriceTo: searchParams.get('PriceTo') || '',
+        isOnSale: searchParams.get('isOnSale') || false,
+        isFoxtrot: searchParams.get('isFoxtrot') || false,
+        isRozetka: searchParams.get('isRozetka') || false,
+        limit: PER_PAGE * PER_ROW,
+      });
+  
+      const page = searchParams.get('offset') / (PER_PAGE * PER_ROW);
+  
+      setPage(page ? page : 1);
+    }
+
+    setLoading(true);
+    fetchProducts({
+      ...searchObj,
+      offset: (page - 1) * PER_PAGE * PER_ROW,
+      limit: PER_PAGE * PER_ROW
+    }).then(data => {
+      setProducts(data);
+      setLoading(false);
+    });
+  }, [searchParams])
+
+
+  const handleParamsChange = e => {
+    setParams(prevParams => ({
+      ...prevParams,
+      [e.target.name]: e.target.value
+    }));
+  }
+
+  const handleCheckChange = e => {
+    setParams(prevParams => ({
+      ...prevParams,
+      [e.target.name]: e.target.checked
+    }));
+  }
+
+  const handleFilter = e => {
+    e.preventDefault();
+    setSearchParams(Object.fromEntries(Object.entries(params).filter(param => param[1])));
+  }
 
   return (
     <SearchResultsWrapper>
-      <Filters />
-      <Stack spacing={3} sx={{width: '100%'}}>
-      <ProductsList itemsPerRow={4} rows={2} data={dummyData} page={page}/>
-        <Pagination
-            count={Math.ceil(dummyData.length / PER_PAGE)}
-            page={page}
-            onChange={(e, value) => setPage(value)}
-            sx={{
-              "& .MuiPagination-ul": {
-                justifyContent: "center"
-              },
-              "& .MuiPaginationItem-root": {
-                fontWeight: "700",
-                fontSize: "1rem",
-              },
-              "& .Mui-selected" : {
-                textDecoration: "underline",
-                backgroundColor: "transparent",
-              }
-            }}
-          />
-        </Stack>
+        <Filters onFilter={handleFilter} values={params} onCheckChange={handleCheckChange} onParamsChange={handleParamsChange} />
+        {loading ? <CircularProgress color="secondary" size={80}/> : <View page={page} products={products} handlePageChange={setPage}/>}
     </SearchResultsWrapper>
   );
 };
+
+const View = ({products, page, handlePageChange}) => {
+  return (
+    <Stack spacing={3} sx={{width: '100%'}}>
+      <ProductsList itemsPerRow={4} rows={2} data={products.result} page={page}/>
+      <Pagination
+          count={Math.ceil(products.total / (PER_PAGE * PER_ROW))}
+          page={page}
+          onChange={(e, value) => handlePageChange(value)}
+          sx={{
+            "& .MuiPagination-ul": {
+              justifyContent: "center"
+            },
+            "& .MuiPaginationItem-root": {
+              fontWeight: "700",
+              fontSize: "1rem",
+            },
+            "& .Mui-selected" : {
+              textDecoration: "underline",
+              backgroundColor: "transparent",
+            }
+          }}
+        />
+    </Stack>
+  )
+}
 
 export default SearchResults;
