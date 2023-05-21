@@ -1,7 +1,5 @@
-import { Link } from "expo-router";
 import * as Linking from "expo-linking";
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, Pressable, View, Image, Button } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import { useAuth } from "../../../../src/auth/auth";
 
 const styles = StyleSheet.create({
@@ -70,62 +68,68 @@ const user = {
 }
 
 const Home = (props) => {
-  const { signOut } = useAuth();
+  const { user } = useAuth();
 
   return (
     <View style={styles.layout.container}>
-      <View style={styles.layout.profileImageContainer}>
-        <Image
-          source={{
-            uri: user.profileImageUrl
-          }}
-          style={{
-            height: 200,
-            width: 200,
-            borderRadius: 100,
-            marginTop: 30,
-          }} />
-      </View>
-      <View style={styles.utils.center}>
-        <Text style={styles.typography.userInfo.main}>
-          {user.name}
-        </Text>
-        <Text style={styles.typography.userInfo.sub}>
-          {user.email}
-        </Text>
-      </View>
-      <View style={styles.layout.subscriptionSection.heading}>
-        <Text style={styles.typography.subscriptionSection.heading}>
-          Преміум-підписка
-        </Text>
-        {(user.isPremium) ?
-          <View style={styles.layout.subscriptionSection.body}>
-            <Text style={styles.typography.subscriptionSection.body}>
-              Ваша підписка діє з 28.04.2023 до 28.05.2023
+      {(user) ?
+        <>
+          <View style={styles.layout.profileImageContainer}>
+            <Image
+              source={{
+                uri: user.picture.slice(0, user.picture.indexOf("s96-c")) + "s256-c"
+              }}
+              style={{
+                height: 200,
+                width: 200,
+                borderRadius: 100,
+                marginTop: 30,
+              }} />
+          </View>
+          <View style={styles.utils.center}>
+            <Text style={styles.typography.userInfo.main}>
+              {user.name}
             </Text>
-            <Text style={styles.typography.subscriptionSection.body}>
-              До сплину підписки 30 днів
-            </Text>
-            <Text
-              style={styles.typography.subscriptionSection.link}
-              onPress={() => Linking.openURL("https://pricely.tech")}
-            >
-              Продовжити підписку можна у веб-версії застосунку
-            </Text>
-          </View> :
-          <View>
-            <Text style={styles.typography.subscriptionSection.body}>
-              На даний момент преміум-підписка не активна
-            </Text>
-            <Text
-              style={styles.typography.subscriptionSection.link}
-              onPress={() => Linking.openURL("https://pricely.tech")}
-            >
-              Оформити підписку можна у веб-версії застосунку
+            <Text style={styles.typography.userInfo.sub}>
+              {user.email}
             </Text>
           </View>
-        }
-      </View>
+          <View style={styles.layout.subscriptionSection.heading}>
+            <Text style={styles.typography.subscriptionSection.heading}>
+              Преміум-підписка
+            </Text>
+            {(user.isPremium) ?
+              <View style={styles.layout.subscriptionSection.body}>
+                <Text style={styles.typography.subscriptionSection.body}>
+                  Ваша підписка діє з 28.04.2023 до 28.05.2023
+                </Text>
+                <Text style={styles.typography.subscriptionSection.body}>
+                  До сплину підписки 30 днів
+                </Text>
+                <Text
+                  style={styles.typography.subscriptionSection.link}
+                  onPress={() => Linking.openURL("https://pricely.tech")}
+                >
+                  Продовжити підписку можна у веб-версії застосунку
+                </Text>
+              </View> :
+              <View>
+                <Text style={styles.typography.subscriptionSection.body}>
+                  На даний момент преміум-підписка не активна
+                </Text>
+                <Text
+                  style={styles.typography.subscriptionSection.link}
+                  onPress={() => Linking.openURL("https://pricely.tech")}
+                >
+                  Оформити підписку можна у веб-версії застосунку
+                </Text>
+              </View>
+            }
+          </View>
+        </> :
+        <Text>
+          Loading...
+        </Text>}
     </View>
   )
 };
