@@ -10,69 +10,6 @@ import ProductList from "../components/ProductsList/ProductList"
 import { CircularProgress } from "@mui/material";
 import { useAuthContext } from "../auth/auth";
 
-const dummyData = [
-  {
-    Id: 0,
-    Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
-    RawIconURL:
-      "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
-    VendorIcon: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/ROZETKA-Logo-L3-B-RGB.png/1200px-ROZETKA-Logo-L3-B-RGB.png",
-    RawPrice: 35999,
-    OldPrice: 39999,
-    IsOnSale: true,
-    Specifications: [
-      {
-        Key: 'Серия',
-        Value: 'TUF Gaming'
-      },
-      {
-        Key: 'Диагональ экрана',
-        Value: '"15.6" (1920x1080) Full HD'
-      },
-      {
-        Key: 'Тип экрана',
-        Value: 'IPS'
-      },
-    ]
-  },
-  {
-    Id: 1,
-    Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
-    RawIconURL:
-      "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
-    RawPrice: 35999,
-    OldPrice: 0,
-    IsOnSale: false,
-  },
-  {
-    Id: 2,
-    Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
-    RawIconURL:
-      "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
-    RawPrice: 35999,
-    OldPrice: 0,
-    IsOnSale: false,
-  },
-  {
-    Id: 3,
-    Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
-    RawIconURL:
-      "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
-    RawPrice: 35999,
-    OldPrice: 0,
-    IsOnSale: false,
-  },
-  {
-    Id: 4,
-    Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
-    RawIconURL:
-      "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
-    RawPrice: 35999,
-    OldPrice: 0,
-    IsOnSale: false,
-  },
-];
-
 const ProductWrapper = styled.div`
   flex: 1 0 0;
   display: flex;
@@ -127,9 +64,20 @@ const fetchRecommended = async id => {
 }
 
 const fetchFavouritedState = async (id, jwt) => {
-  const response = await fetch(`https://pricely.tech/api/Favourites/isOnFavourites?id=${id}&jwt=${jwt}`);
+  const response = await fetch(`https://pricely.tech/api/Favourites/isOnFavourites?itemId=${id}&jwt=${jwt}`);
   return await response.json();
+}
 
+const updateProductFavourite = async (id, jwt, isFavourited) => {
+  const response = await fetch(`https://pricely.tech/api/Favourites?itemId=${id}`, {
+    method: isFavourited ? "DELETE" : "POST",
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(jwt)
+  })
+
+  return response;
 }
 
 const Product = () => {
@@ -158,6 +106,7 @@ const Product = () => {
 
   const handleFavouriteChange = () => {
     setIsFavourited(prevState => !prevState);
+    updateProductFavourite(id, user?.jwt, isFavourited);
   }
 
   return (
