@@ -4,6 +4,7 @@ import (
 	"GoMicroservices/CoreStructs"
 	"GoMicroservices/genericDb"
 	"GoMicroservices/watchdog/foxtrot"
+	"GoMicroservices/watchdog/notifications"
 	"GoMicroservices/watchdog/rozetka"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -114,6 +115,10 @@ func watchdogIteration(db *sqlx.DB) {
 
 			insertPriceHistory(priceHistory)
 
+			if isOnSale == true {
+				notifications.SendNotifications(db, item)
+			}
+
 			err := UpdateRawItemPrice(db, rawItem.Id, currentPrice, currentOldPrice, isOnSale)
 			if err != nil {
 				log.Println("Error in updating price of RawItem")
@@ -125,15 +130,17 @@ func watchdogIteration(db *sqlx.DB) {
 }
 
 func main() {
-	db := sqlx.MustConnect("postgres", "postgres://doadmin:AVNS_y5YBzYRh_TXY10W9cwL@db-postgresql-fra1-48384-do-user-11887088-0.b.db.ondigitalocean.com:25060/StoreDb")
-	defer db.Close()
-	db.SetMaxOpenConns(1)
-	db.SetMaxIdleConns(1)
+	for {
+		db := sqlx.MustConnect("postgres", "postgres://doadmin:AVNS_y5YBzYRh_TXY10W9cwL@db-postgresql-fra1-48384-do-user-11887088-0.b.db.ondigitalocean.com:25060/StoreDb")
+		defer db.Close()
+		db.SetMaxOpenConns(1)
+		db.SetMaxIdleConns(1)
 
-	for true {
-		if lastDate, err := getLastDate(db); err != nil || (err == nil && time.Now().AddDate(0, 0, -1).After(lastDate)) {
+		if lastDate, err := getLastDate(db); err != nil || (err == nil && time.Now().Add(-1*time.Hour*4).After(lastDate)) {
 			watchdogIteration(db)
 		}
-		time.Sleep(time.Hour*24 + 1*time.Minute)
+
+		db.Close()
+		time.Sleep(time.Hour*4 + 1*time.Minute)
 	}
 }
