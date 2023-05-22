@@ -1,7 +1,10 @@
-﻿using Core;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using Core;
 using DataLayer.Abstract;
 using Google.Apis.Auth;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace DataLayer.Repository;
 
@@ -36,7 +39,11 @@ public class UserRepository : IUserRepository
         }
         catch (InvalidJwtException ex)
         {
-            return null;
+            payload = await GetPayloadFromCustomJwt(jwt);
+            if (payload == null)
+            {
+                return null;
+            }
         }
 
         if (!_db.Users.Any(x => x.Email == payload.Email))
@@ -57,6 +64,31 @@ public class UserRepository : IUserRepository
         var returnUser = _db.Users.First(x => x.Email == payload.Email);
         
         return returnUser;
+    }
+
+    private async Task<GoogleJsonWebSignature.Payload?> GetPayloadFromCustomJwt(string jwt)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        try
+        {
+            var jwtToken = tokenHandler.ReadJwtToken(jwt);
+
+            var claims = jwtToken.Claims;
+
+            var payload = new GoogleJsonWebSignature.Payload
+            {
+                Email = claims.First(x => x.Type == "email").Value,
+                GivenName = claims.First(x => x.Type == "given_name").Value,
+                FamilyName = claims.First(x => x.Type == "family_name").Value,
+                Picture = claims.First(x => x.Type == "picture").Value
+            };
+
+            return payload;
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
     }
     
     
