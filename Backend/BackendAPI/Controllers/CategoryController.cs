@@ -9,35 +9,25 @@ namespace BackendAPI.Controllers
     public class CategoryController : ControllerBase
     {
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IUserRepository _userRepository;
 
-        public CategoryController(ICategoryRepository categoryRepository)
+        public CategoryController(ICategoryRepository categoryRepository, IUserRepository userRepository)
         {
             _categoryRepository = categoryRepository;
+            _userRepository = userRepository;
         }
 
         [HttpGet]
-        public async Task<ActionResult<ResultPage<Category>>> GetAllCategories(int offset, int limit, string jwt)
+        public async Task<ActionResult<ResultPage<Category>>> GetAllCategories()
         {
-            var user = await _categoryRepository.GetUserByJwt(jwt);
-            if (user == null || !user.Admin)
-            {
-                return Unauthorized();
-            }
-
-            var resultPage = await _categoryRepository.GetAllCategories(offset, limit, user.Id);
+            var resultPage = await _categoryRepository.GetAllCategories();
             return Ok(resultPage);
         }
 
         [HttpGet("{categoryId}")]
-        public async Task<ActionResult<Category>> GetCategoryById(int categoryId, string jwt)
+        public async Task<ActionResult<Category>> GetCategoryById(int categoryId)
         {
-            var user = await _categoryRepository.GetUserByJwt(jwt);
-            if (user == null || !user.Admin)
-            {
-                return Unauthorized();
-            }
-
-            var category = await _categoryRepository.GetCategoryById(categoryId, user.Id);
+            var category = await _categoryRepository.GetCategoryById(categoryId);
             if (category == null)
             {
                 return NotFound();
@@ -47,31 +37,35 @@ namespace BackendAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Category>> CreateCategory(Category category, string jwt)
+        public async Task<ActionResult> CreateCategory([FromBody]string jwt, string categoryName)
         {
-            var user = await _categoryRepository.GetUserByJwt(jwt);
-            if (user == null || !user.Admin)
+            var user = await _userRepository.GetOrRegisterUser(jwt);
+            if (user == null || !user.IsAdmin)
             {
                 return Unauthorized();
             }
 
-            var createdCategory = await _categoryRepository.CreateCategory(category, user.Id);
-            return CreatedAtAction(nameof(GetCategoryById), new { categoryId = createdCategory.Id }, createdCategory);
+            if (await _categoryRepository.CreateCategory(categoryName, user))
+            {
+                return Ok();
+            }
+
+            return BadRequest();
         }
 
-        [HttpDelete("{categoryId}")]
-        public async Task<ActionResult> DeleteCategory(int categoryId, string jwt)
+        [HttpDelete]
+        public async Task<ActionResult> DeleteCategory([FromBody]string jwt, int categoryId)
         {
-            var user = await _categoryRepository.GetUserByJwt(jwt);
-            if (user == null || !user.Admin)
+            var user = await _userRepository.GetOrRegisterUser(jwt);
+            if (user == null || !user.IsAdmin)
             {
                 return Unauthorized();
             }
 
-            var result = await _categoryRepository.DeleteCategory(categoryId, user.Id);
+            var result = await _categoryRepository.DeleteCategory(categoryId, user);
             if (result)
             {
-                return NoContent();
+                return Ok();
             }
 
             return NotFound();

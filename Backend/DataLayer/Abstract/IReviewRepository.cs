@@ -2,13 +2,13 @@ using Core;
 
 namespace DataLayer.Abstract;
 
-public class ReviewRepository: IReviewRepository
+public interface IReviewRepository
 {
-    public async Task<bool> AddReview(Review review, long itemId, User currentUser);
+    public Task<bool> AddReview(int grade, string? reviewText, long itemId, User currentUser);
     
-    public async Task<bool> DeleteReview(int reviewId, string userId, bool isAdmin);
+    public Task<bool> DeleteReview(int reviewId, User user);
     
-    public async Task<ResultPage<Review>> GetAllReviews(long itemId, int offset, int limit);
+    public Task<ResultPage<Review>> GetAllReviews(long itemId, int offset, int limit);
 }
 
 
