@@ -106,7 +106,7 @@ func watchdogIteration(db *sqlx.DB) {
 			break
 		}
 
-		if currentPrice != rawItem.RawPrice || !isPriceHistoryInitialised(db, item.Id) {
+		if currentPrice != 0 && (currentPrice != rawItem.RawPrice || !isPriceHistoryInitialised(db, item.Id)) {
 			priceHistory := CoreStructs.PriceHistory{
 				ItemId: item.Id,
 				Price:  currentPrice,
@@ -125,7 +125,7 @@ func watchdogIteration(db *sqlx.DB) {
 			}
 		}
 
-		time.Sleep(1 * time.Second)
+		time.Sleep(3 * time.Second)
 	}
 }
 

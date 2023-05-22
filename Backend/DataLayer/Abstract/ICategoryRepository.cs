@@ -2,12 +2,12 @@ using Core;
 
 namespace DataLayer.Abstract;
 
-public class CategoryRepository: ICategoryRepository
+public interface ICategoryRepository
 {
-  public async Task<bool> BindRawCategoryAsync(long categoryId, string rawCategory);
-  public async Task<ResultPage<Category>> GetAllCategories(int offset, int limit, string userId);
-  public async Task<Category> GetCategoryById(int categoryId, string userId);
-  public async Task<Category> CreateCategory(Category category, string userId);
-  public async Task<bool> DeleteCategory(int categoryId, string userId);
+  public Task<bool> BindRawCategoryAsync(long categoryId, long rawCategoryId);
+  public Task<IList<Category>?> GetAllCategories();
+  public Task<Category?> GetCategoryById(int categoryId);
+  public Task<bool> CreateCategory(string categoryName, User user);
+  public Task<bool> DeleteCategory(int categoryId, User user);
 
 }

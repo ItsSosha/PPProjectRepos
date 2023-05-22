@@ -9,64 +9,59 @@ public class CategoryRepository: ICategoryRepository
 {
     private readonly StoreContext _db;
 
-    public CaregoryRepository(StoreContext db)
+    public CategoryRepository(StoreContext db)
     {
         _db = db;
     }
     
-    public async Task<bool> BindRawCategoryAsync(long categoryId, string rawCategory)
+    public async Task<bool> BindRawCategoryAsync(long categoryId, long rawCategoryId)
     {
         var category = await _db.Categories.FindAsync(categoryId);
-        if (category == null)
+        var rawCategory = await _db.RawCategories.FindAsync(rawCategoryId);
+        if (category == null || rawCategory == null)
             return false;
 
         // Сonnect `RawCategory` & `Category`
-        category.RawCategory = rawCategory;
-
+        rawCategory.Category = category;
+        
         await _db.SaveChangesAsync();
         return true;
     }
     
-    public async Task<ResultPage<Category>> GetAllCategories(int offset, int limit, string userId)
+    public async Task<IList<Category>?> GetAllCategories()
     {
-        if (!await IsAdmin(userId))
-        {
-            throw new UnauthorizedAccessException("Only administrators can access this method.");
-        }
-
-        var categories = _db.Categories;
-        var resultPage = await GenericPaginator.Paginate(categories, offset, limit);
-        return resultPage;
+        var categories = await _db.Categories.ToListAsync();
+        return categories;
     }
 
-    public async Task<Category> GetCategoryById(int categoryId, string userId)
+    public async Task<Category?> GetCategoryById(int categoryId)
     {
-        if (!await IsAdmin(userId))
-        {
-            throw new UnauthorizedAccessException("Only administrators can access this method.");
-        }
-
         var category = await _db.Categories.FindAsync(categoryId);
         return category;
     }
 
-    public async Task<Category> CreateCategory(Category category, string userId)
+    public async Task<bool> CreateCategory(string categoryName, User user)
     {
-        if (!await IsAdmin(userId))
+        if (!user.IsAdmin)
         {
-            throw new UnauthorizedAccessException("Only administrators can access this method.");
+            return false;
         }
+
+        var category = new Category()
+        {
+            Name = categoryName
+        };
 
         _db.Categories.Add(category);
         await _db.SaveChangesAsync();
-        return category;
+        return true;
     }
 
-    public async Task<bool> DeleteCategory(int categoryId, string userId)
+    public async Task<bool> DeleteCategory(int categoryId, User user)
     {
-        if (!await IsAdmin(userId))
+        if (!user.IsAdmin)
         {
-            throw new UnauthorizedAccessException("Only administrators can access this method.");
+            return false;
         }
 
         var category = await _db.Categories.FindAsync(categoryId);
@@ -77,13 +72,8 @@ public class CategoryRepository: ICategoryRepository
 
         _db.Categories.Remove(category);
         await _db.SaveChangesAsync();
+        
         return true;
-    }
-
-    public async Task<bool> IsAdmin(string userId)
-    {
-        var user = await _db.Users.FindAsync(userId);
-        return user != null && user.Admin;
     }
 }
 
