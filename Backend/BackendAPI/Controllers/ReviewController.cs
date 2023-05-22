@@ -17,21 +17,21 @@ namespace BackendAPI.Controllers
         private readonly IReviewRepository _reviewRepository;
         private readonly IUserRepository _userRepository; 
 
-        public ReviewController(IReviewRepository reviewRepository, IUserRepository userRepository,)
+        public ReviewController(IReviewRepository reviewRepository, IUserRepository userRepository)
         {
             _reviewRepository = reviewRepository;
             _userRepository = userRepository;
         }
-
-     [HttpPost]
-        [Authorize]
-        public async Task<IActionResult> AddReview([FromBody] Review review, long itemId)
+        
+        [HttpPost]
+        [Route(("add"))]
+        public async Task<IActionResult> AddReview([FromBody] string jwt, int grade, string? reviewText, long itemId)
         {
-            User currentUser = _userRepository.GetCurrentUser(); 
+            var currentUser = await _userRepository.GetOrRegisterUser(jwt); 
 
-            if (currentUser != null && currentUser.IsAuthenticated)
+            if (currentUser != null)
             {
-                bool success = await _reviewRepository.AddReview(review, itemId);
+                bool success = await _reviewRepository.AddReview(grade, reviewText, itemId, currentUser);
 
                 if (success)
                 {
@@ -44,16 +44,15 @@ namespace BackendAPI.Controllers
             return Unauthorized(); 
         }
 
-        [HttpDelete("{reviewId}")]
-        [Authorize]
-        public async Task<IActionResult> DeleteReview(int reviewId)
+        [HttpDelete]
+        [Route(("delete/{reviewId}"))]
+        public async Task<IActionResult> DeleteReview([FromBody] string jwt, int reviewId)
         {
-            User currentUser = _userRepository.GetCurrentUser(); // Получаем текущего пользователя
+            var currentUser = await _userRepository.GetOrRegisterUser(jwt); // Получаем текущего пользователя
 
-            if (currentUser != null && currentUser.IsAuthenticated)
+            if (currentUser != null)
             {
-                bool isAdmin = currentUser.IsAdmin;
-                bool success = await _reviewRepository.DeleteReview(reviewId, currentUser.Id, isAdmin);
+                bool success = await _reviewRepository.DeleteReview(reviewId, currentUser);
 
                 if (success)
                 {
@@ -66,8 +65,9 @@ namespace BackendAPI.Controllers
             return Unauthorized(); 
         }
 
-        [HttpGet("items/{itemId}/reviews")]
-        public async Task<IActionResult> GetReviewsForItemWithPagination(long itemId, int offset = 0, int limit = 10)
+        [HttpGet]
+        [Route("get/{itemId}")]
+        public async Task<IActionResult> GetReviewsForItem(long itemId, int offset = 0, int limit = Int32.MaxValue)
         {
             var reviewsPage = await _reviewRepository.GetAllReviews(itemId, offset, limit);
 

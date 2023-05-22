@@ -119,6 +119,7 @@ public class UserRepository : IUserRepository
             .Include(ui => ui.Item)
                 .ThenInclude(i => i.RawItem)
                     .ThenInclude(ri => ri.Specifications)
+            .Where(x => x.UserId == user.Id)
             .ToListAsync();
     }
 
