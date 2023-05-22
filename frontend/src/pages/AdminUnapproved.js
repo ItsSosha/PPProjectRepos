@@ -18,18 +18,31 @@ const fetchUnapprovedItems = async (jwt) => {
     return await data.json();
 }
 
+const approveItem = async (jwt, id) => {
+  const response = await fetch(`https://pricely.tech/api/Item/addToItems?rawItemId=${id}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(jwt)
+  });
+  
+  if (!response.ok) {
+    throw new Error();
+  }
+
+  return await fetchUnapprovedItems(jwt);
+}
+
 const AdminUnapproved = () => {
   const [rows, setRows] = useState([]);
   const [activeItem, setActiveItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const { user } = useAuthContext();
 
-  const handleItemChange = (index) => {
-    const rowsCopy = [...rows];
-    rowsCopy.splice(index, 1);
-
+  const handleItemChange = (item) => {
+    approveItem(user?.jwt, item.id).then(data => setRows(data.result));
     setActiveItem(null);
-    setRows(rowsCopy);
   };
 
   useEffect(() => {
@@ -44,7 +57,7 @@ const AdminUnapproved = () => {
     <div>
       <Modal onModalClose={() => setActiveItem(null)} open={activeItem != null}>
         <ModalProductDetails
-          product={rows[activeItem]}
+          product={activeItem}
           onItemChange={() => handleItemChange(activeItem)}
         />
       </Modal>
@@ -60,7 +73,7 @@ const AdminUnapproved = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row, index) => (
+            {rows.map(row => (
               <TableRow
                 key={row.id}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -76,7 +89,7 @@ const AdminUnapproved = () => {
                     variant="contained"
                     color="secondary"
                     sx={{ color: "#FFF" }}
-                    onClick={() => setActiveItem(index)}
+                    onClick={() => setActiveItem(row)}
                   >
                     Деталі
                   </Button>
