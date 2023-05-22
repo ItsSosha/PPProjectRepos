@@ -33,8 +33,16 @@ public class CategoryRepository: ICategoryRepository
         var categories = await _db.Categories.ToListAsync();
         return categories;
     }
+    
+    public async Task<IList<RawCategory>?> GetAllRawCategories()
+    {
+        var rawCategories = await _db.RawCategories
+            .Include(x => x.Store)
+            .ToListAsync();
+        return rawCategories;
+    }
 
-    public async Task<Category?> GetCategoryById(int categoryId)
+    public async Task<Category?> GetCategoryById(long categoryId)
     {
         var category = await _db.Categories.FindAsync(categoryId);
         return category;
@@ -57,14 +65,14 @@ public class CategoryRepository: ICategoryRepository
         return true;
     }
 
-    public async Task<bool> DeleteCategory(int categoryId, User user)
+    public async Task<bool> DeleteCategory(long categoryId, User user)
     {
         if (!user.IsAdmin)
         {
             return false;
         }
 
-        var category = await _db.Categories.FindAsync(categoryId);
+        var category = await _db.Categories.FirstOrDefaultAsync(x => x.Id == categoryId);
         if (category == null)
         {
             return false;
