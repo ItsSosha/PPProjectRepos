@@ -38,6 +38,7 @@ public class CategoryRepository: ICategoryRepository
     {
         var rawCategories = await _db.RawCategories
             .Include(x => x.Store)
+            .Include(x => x.Category)
             .ToListAsync();
         return rawCategories;
     }
