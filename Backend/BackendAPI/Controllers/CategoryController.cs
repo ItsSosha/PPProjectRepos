@@ -70,5 +70,22 @@ namespace BackendAPI.Controllers
 
             return NotFound();
         }
+        [HttpPost]
+        [Route("bindCategory")]
+        public async Task<ActionResult<bool>> BindRawCategory(long categoryId, long rawCategoryId)
+        {
+            var success = await _categoryRepository.BindRawCategoryAsync(categoryId, rawCategoryId);
+    
+            if (success)
+            {
+                return Ok(true);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+ 
     }
+    
 }
