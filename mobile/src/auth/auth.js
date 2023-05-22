@@ -2,6 +2,7 @@ import { useRouter, useSegments } from "expo-router";
 import { useState, useEffect, useContext, createContext } from "react";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
+import JWT from 'expo-jwt';
 
 const AuthContext = createContext(null);
 
@@ -57,9 +58,14 @@ export function AuthProvider(props) {
       }
 
       const user = await response.json();
-      setUser(user);
 
+      const key = "an exceptionally secret key";
+      const jwt = JWT.encode(user, key, { algorithm: "HS256" });
+      console.log(jwt);
+
+      setUser(user);
     } catch (error) {
+      console.log(error)
       setUser(null);
     }
   };
