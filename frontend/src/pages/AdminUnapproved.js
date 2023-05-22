@@ -8,18 +8,21 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import { CircularProgress } from "@mui/material";
 import { Button } from "@mui/material";
 import { useState, useEffect } from "react";
+import { useAuthContext } from "../auth/auth";
 
 const fetchUnapprovedItems = async (jwt) => {
-    const data = await fetch(`https://pricely.tech/api/Item/getAllNotApproved?jwt=${jwt}&offset=0`);
+    const data = await fetch(`https://pricely.tech/api/Item/getAllNotApproved?jwt=${jwt}&offset=0&limit=1000`);
+    return await data.json();
 }
 
 const AdminUnapproved = () => {
-  const [rows, setRows] = useState(
-    dummyAdminData.filter((item) => !item.isApproved)
-  );
+  const [rows, setRows] = useState([]);
   const [activeItem, setActiveItem] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuthContext();
 
   const handleItemChange = (index) => {
     const rowsCopy = [...rows];
@@ -30,8 +33,11 @@ const AdminUnapproved = () => {
   };
 
   useEffect(() => {
-    fetchUnapprovedItems()
-      .then(console.log);
+    fetchUnapprovedItems(user?.jwt)
+      .then(data => {
+        setRows(data.result);
+        setLoading(false);
+      });
   }, []);
 
   return (
@@ -42,6 +48,8 @@ const AdminUnapproved = () => {
           onItemChange={() => handleItemChange(activeItem)}
         />
       </Modal>
+      {loading ? 
+        <CircularProgress color="secondary" size={80}/> : 
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
@@ -54,7 +62,7 @@ const AdminUnapproved = () => {
           <TableBody>
             {rows.map((row, index) => (
               <TableRow
-                key={row.name}
+                key={row.id}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
                 <TableCell component="th" scope="row">
@@ -77,7 +85,7 @@ const AdminUnapproved = () => {
             ))}
           </TableBody>
         </Table>
-      </TableContainer>
+      </TableContainer>}
     </div>
   );
 };

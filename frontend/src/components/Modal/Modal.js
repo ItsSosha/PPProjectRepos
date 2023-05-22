@@ -13,6 +13,8 @@ const ModalContent = styled.div`
   align-items: center;
   row-gap: 1em;
   max-width: 920px;
+  max-height: 80vh;
+  overflow: auto;
 `;
 
 const Transition = forwardRef((props, ref) => {
