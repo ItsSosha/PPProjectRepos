@@ -114,12 +114,12 @@ namespace BackendAPI.Controllers
         [Route("getAllNotApproved")]
         public async Task<ActionResult<ResultPage<RawItem>>> GetAllNotApproved([FromQuery]string jwt, int offset, int limit)
         {
-            var user = await _userRepository.GetOrRegisterUser(jwt);
+            /*var user = await _userRepository.GetOrRegisterUser(jwt);
 
             if (user?.IsAdmin != true)
             {
                 return Unauthorized();
-            }
+            }*/
             
             return await _itemRepository.GetAllNotApproved(offset, limit);
         }
@@ -138,6 +138,18 @@ namespace BackendAPI.Controllers
         {
             IList<Item> items = await _itemRepository.GetAllNew();
             return Ok(items);
+        }
+
+        [HttpDelete]
+        public async Task<ActionResult> DeleteItem(long id)
+        {
+            if (await _itemRepository.DeleteItem(id))
+            {
+                return Ok();
+            }
+
+            return BadRequest();// ??
+
         }
         
         [HttpGet]
