@@ -21,7 +21,7 @@ namespace BackendAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ResultPage<Item>>> GetAll(int offset, int limit)
+        public async Task<ActionResult<ResultPage<Item>>> GetAll(int offset = 0, int limit = Int32.MaxValue)
         {
             return await _itemRepository.GetAll(offset, limit);
         }
@@ -112,7 +112,7 @@ namespace BackendAPI.Controllers
         
         [HttpGet]
         [Route("getAllNotApproved")]
-        public async Task<ActionResult<ResultPage<RawItem>>> GetAllNotApproved([FromQuery]string jwt, int offset, int limit)
+        public async Task<ActionResult<ResultPage<RawItem>>> GetAllNotApproved([FromQuery]string jwt, int offset = 0, int limit = Int32.MaxValue)
         {
             var user = await _userRepository.GetOrRegisterUser(jwt);
 
