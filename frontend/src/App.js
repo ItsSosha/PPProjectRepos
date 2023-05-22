@@ -8,22 +8,27 @@ import { AuthProvider } from "./auth/auth";
 import Modal from "./components/Modal/Modal"
 import ModalAuth from "./components/Modal/ModalAuth";
 
+const fetchUser = async (jwt) => {
+  const response = await fetch(`https://pricely.tech/api/User?jwt=${jwt}`);
+
+  if (!response.ok) {
+    throw new Error();
+  }
+
+  return await response.json();
+}
+
+const fetchCategories = async () => {
+  const response = await fetch('https://pricely.tech/api/Category');
+  return await response.json();
+}
+
 function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isLoginModalOpen, setLoginModalOpen] = useState(false);
+  const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-
-
-  const fetchUser = async (jwt) => {
-      const response = await fetch(`https://pricely.tech/api/User?jwt=${jwt}`);
-
-      if (!response.ok) {
-        throw new Error();
-      }
-
-      return await response.json();
-  }
 
   const handleLogin = async (resp) => {
     setLoginModalOpen(false);
@@ -71,6 +76,10 @@ function App() {
         });
       });
     }
+
+    fetchCategories()
+      .then(setCategories);
+
   }, []);
 
   return (
@@ -80,6 +89,7 @@ function App() {
         <ModalAuth />
       </Modal>
       <Sidebar
+        categories={categories}
         isSidebarOpen={isSidebarOpen}
         setSidebarOpen={setSidebarOpen}
       />

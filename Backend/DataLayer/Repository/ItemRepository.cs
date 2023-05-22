@@ -47,16 +47,50 @@ public class ItemRepository : IItemRepository
         return false;
     }
 
+    public async Task<bool> DeleteItem(long id)
+    {
+        var item = await _db.Items.FindAsync(id);
+        
+        if (item != null)
+        {
+            _db.Items.Remove(item);
+            
+            var reviews = await _db.Reviews
+                .Where(x => x.ItemId == id).ToListAsync();
+
+            if (reviews != null)
+            {
+                _db.Reviews.RemoveRange(reviews);
+            }
+            
+            var priceHistories = await _db.PriceHistories
+                .Where(x => x.ItemId == id).ToListAsync();
+            
+            if (priceHistories != null)
+            {
+                _db.PriceHistories.RemoveRange(priceHistories);
+            }
+            
+            await _db.SaveChangesAsync();
+            return true;
+        }
+        
+        return false;
+    }
+
     public async Task<ResultPage<Item>> GetAll(int offset, int limit)
     {
         return await GenericPaginator.Paginate(_db.Items
             .Include(i => i.RawItem)
-            .ThenInclude(c => c.RawCategory), offset, limit);
+            .ThenInclude(c => c.RawCategory)
+            .ThenInclude(s => s.Store), offset, limit);
     }
 
     public async Task<ResultPage<RawItem>> GetAllNotApproved(int offset, int limit)
     {
         return await GenericPaginator.Paginate(_db.RawItems
+            .Include(rc=> rc.RawCategory)
+            .ThenInclude(s => s.Store)
             .Where(ri => !_db.Items.Any(i => i.RawItemId == ri.Id)), offset, limit);
     }
 

@@ -46,7 +46,7 @@ namespace BackendAPI.Controllers
 
         [HttpDelete]
         [Route(("delete/{reviewId}"))]
-        public async Task<IActionResult> DeleteReview([FromBody] string jwt, int reviewId)
+        public async Task<IActionResult> DeleteReview([FromBody] string jwt, long reviewId)
         {
             var currentUser = await _userRepository.GetOrRegisterUser(jwt); // Получаем текущего пользователя
 
