@@ -5,6 +5,7 @@ import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import FavouritesService from "../../../../src/API/FavouritesService";
 import { useAuth } from "../../../../src/auth/auth";
 import ProductList from "../../../../src/components/ProductList/ProductList";
+import { useIsFocused } from "@react-navigation/native";
 
 const styles = StyleSheet.create({
   container: {
@@ -39,6 +40,10 @@ const styles = StyleSheet.create({
       borderWidth: 2,
       color: "#FFF"
     }
+  },
+  emptyListHeading: {
+    marginTop: 10,
+    fontSize: 20
   }
 })
 
@@ -47,6 +52,7 @@ const PER_PAGE = 4;
 const Wishlist = (props) => {
   const [favourites, setFavourites] = useState([]);
   const [loadedMore, setLoadedMore] = useState(1);
+  const isFocused = useIsFocused();
 
   async function fetchFavourites(user) {
     try {
@@ -60,7 +66,7 @@ const Wishlist = (props) => {
   }
 
   const { user } = useAuth();
-  useEffect(() => { fetchFavourites(user) }, [loadedMore]);
+  useEffect(() => { fetchFavourites(user) }, [loadedMore, isFocused]);
   
   const handleFavouritesPress = async (id, user) => {
     setFavourites(favourites.filter(item => item.id != id))
@@ -70,12 +76,19 @@ const Wishlist = (props) => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <StatusBar style="auto" />
+      {(favourites.length > 0) ? 
+      <>
       <ProductList products={favourites} handleFavouritesPress={handleFavouritesPress} user={user} />
       <TouchableOpacity onPress={() => setLoadedMore(prevLoadedMore => prevLoadedMore + 1)} style={styles.loadMoreBtn}>
         <Text style={{ color: "#FFF" }}>
           Load more
         </Text>
       </TouchableOpacity>
+      </> :
+      <Text style={styles.emptyListHeading}>
+        Поки Ваш список бажаного пустий 😞
+      </Text>
+      }
     </ScrollView>
   )
 };
