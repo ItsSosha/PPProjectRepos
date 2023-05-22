@@ -10,55 +10,24 @@ import ProductsList from "../components/ProductsList/ProductList";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "../auth/auth";
 
-const dummyData = [
-  {
-    Id: 0,
-    Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
-    RawIconURL: "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
-    RawPrice: 35999,
-    OldPrice: 39999,
-    IsOnSale: true
-  },
-  {
-    Id: 1,
-    Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
-    RawIconURL: "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
-    RawPrice: 35999,
-    OldPrice: 0,
-    IsOnSale: false
-  },
-  {
-    Id: 2,
-    Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
-    RawIconURL: "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
-    RawPrice: 35999,
-    OldPrice: 0,
-    IsOnSale: false
-  },
-  {
-    Id: 3,
-    Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
-    RawIconURL: "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
-    RawPrice: 35999,
-    OldPrice: 0,
-    IsOnSale: false
-  },
-  {
-    Id: 4,
-    Name: "Ноутбук ASUS TUF Gaming A15 FA506ICB-HN119 (90NR0667-M00KT0) Graphite Black / AMD Ryzen 5 4600H / RAM 16 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050",
-    RawIconURL: "https://content1.rozetka.com.ua/goods/images/big/302686477.jpg",
-    RawPrice: 35999,
-    OldPrice: 0,
-    IsOnSale: false
-  },
-];
-
 const PER_ROW = 4;
 const ROWS = 2;
 
 const fetchUserFavourites = async id => {
   const response = await fetch(`https://pricely.tech/api/Favourites?userId=${id}`);
   return await response.json();
+}
+
+const deleteAllFavourites = async (jwt) => {
+  const response = await fetch(`https://pricely.tech/api/Favourites/deleteAll`, {
+    method: "DELETE",
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(jwt)
+  })
+
+  return response;
 }
 
 const UserWishlist = (props) => {
@@ -70,12 +39,21 @@ const UserWishlist = (props) => {
   useEffect(() => {
     if (user) {
       fetchUserFavourites(user.id).then(data => {
-        setFavourites(data);
+        const actualData = data.map(elem => {
+          return elem.item;
+        })
+        setFavourites(actualData);
         setLoading(false);
       })
     }
   }, [])
 
+  const handleFavouritesDelete = () => {
+    deleteAllFavourites(user?.jwt);
+    setFavourites([]);
+  }
+
+  console.log(favourites);
   return (
     <>
       <Box display="flex" justifyContent="space-between" sx={{
@@ -84,7 +62,7 @@ const UserWishlist = (props) => {
         <Typography variant="h4" fontWeight="700">
           Список бажань
         </Typography>
-        <Button variant="outlined" color="secondary" onClick={() => setFavourites([])}>
+        <Button variant="outlined" color="secondary" onClick={handleFavouritesDelete}>
           Видалити всі
         </Button>
       </Box>

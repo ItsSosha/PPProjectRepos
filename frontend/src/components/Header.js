@@ -106,7 +106,7 @@ const Header = ({ handleSidebarClick, setLoginModalOpen }) => {
                 <IconButton
                   onClick={user ? () => {} : () => setLoginModalOpen(true)}
                   component={(user) ? Link : Button}
-                  to="/users/1/about">
+                  to={`/users/${user?.id}/about`}>
                   
                   <Person sx={{ color: "rgba(0, 0, 0, 1)" }} />
                 </IconButton>
@@ -114,7 +114,10 @@ const Header = ({ handleSidebarClick, setLoginModalOpen }) => {
             </Grid>
             <Grid item xs={1}>
               <GridItemContainer>
-                <IconButton>
+                <IconButton
+                  component={Link}
+                  disabled={(user) ? false : true}
+                  to={`/users/${user?.id}/wishlist`}>
                   <StarOutlineRounded sx={{ color: "rgba(0, 0, 0, 1)" }} />
                 </IconButton>
               </GridItemContainer>

@@ -22,17 +22,6 @@ public class UserRepository : IUserRepository
         {
             return null;
         }
-        
-        user.Favourites = await _db.UserItems
-            .Include(ui => ui.User)
-            .Include(ui => ui.Item)
-            .Where(x => x.User.Id == user.Id)
-            .Select(x => new UserItem()
-            {
-                Id = x.Id,
-                Item = x.Item
-            })
-            .ToListAsync();
 
         return user;
     }
@@ -66,18 +55,7 @@ public class UserRepository : IUserRepository
         }
         
         var returnUser = _db.Users.First(x => x.Email == payload.Email);
-
-        returnUser.Favourites = await _db.UserItems
-            .Include(ui => ui.User)
-            .Include(ui => ui.Item)
-            .Where(x => x.User.Id == returnUser.Id)
-            .Select(x => new UserItem()
-            {
-                Id = x.Id,
-                Item = x.Item
-            })
-            .ToListAsync();
-
+        
         return returnUser;
     }
     
@@ -86,9 +64,7 @@ public class UserRepository : IUserRepository
     {
         if (user == null || item == null ||
             _db.UserItems
-            .Include(ui => ui.User)
-            .Include(ui => ui.Item)
-            .Any(x => x.User.Id == user.Id && x.Item.Id == item.Id))
+                .Any(x => x.UserId == user.Id && x.ItemId == item.Id))
         {
             return false;
         }
@@ -96,12 +72,13 @@ public class UserRepository : IUserRepository
         UserItem favourite = new UserItem()
         {
             User = user,
-            Item = item,
+            ItemId = item.Id,
         };
         
+        
         _db.UserItems.Add(favourite);
+        _db.Entry(item).State = EntityState.Unchanged;
         await _db.SaveChangesAsync();
-        user.Favourites = (await this.GetById(user.Id))!.Favourites;
 
         return true;
     }
@@ -109,27 +86,24 @@ public class UserRepository : IUserRepository
     public async Task<UserItem?> GetFavourite(User user, Item item)
     {
         return await _db.UserItems
-            .Include(ui => ui.User)
             .Include(ui => ui.Item)
-            .FirstOrDefaultAsync(x => x.User.Id == user.Id && x.Item.Id == item.Id);
+                .ThenInclude(i => i.RawItem)
+                    .ThenInclude(ri => ri.Specifications)
+            .FirstOrDefaultAsync(x => x.UserId == user.Id && x.ItemId == item.Id);
     }
     
     public async Task<bool> RemoveFromFavourites(User user, Item item)
     {
         if (user == null || item == null ||
             !_db.UserItems
-                .Include(ui => ui.User)
-                .Include(ui => ui.Item)
-                .Any(x => x.User.Id == user.Id && x.Item.Id == item.Id))
+                .Any(x => x.UserId == user.Id && x.ItemId == item.Id))
         {
             return false;
         }
-
-        var favourite = (await GetFavourite(user, item))!;
-
-        _db.UserItems.Remove(favourite);
+        
+        _db.UserItems.Remove(_db.UserItems.First(x => user.Id == x.UserId && item.Id == x.ItemId));
+        _db.Entry(item).State = EntityState.Unchanged;
         await _db.SaveChangesAsync();
-        user.Favourites = (await this.GetById(user.Id))!.Favourites;
 
         return true;
     }
@@ -142,10 +116,9 @@ public class UserRepository : IUserRepository
         }
         
         return await _db.UserItems
-            .Include(ui => ui.User)
             .Include(ui => ui.Item)
                 .ThenInclude(i => i.RawItem)
-            .Where(x => x.User.Id == user.Id)
+                    .ThenInclude(ri => ri.Specifications)
             .ToListAsync();
     }
 
@@ -161,27 +134,44 @@ public class UserRepository : IUserRepository
         }
         
         return await GenericPaginator.Paginate(_db.UserItems
-            .Include(ui => ui.User)
             .Include(ui => ui.Item)
-            .ThenInclude(i => i.RawItem)
-            .Where(x => x.User.Id == user.Id), offset, limit);
+                .ThenInclude(i => i.RawItem)
+                    .ThenInclude(ri => ri.Specifications)
+            .Where(x => x.UserId == user.Id), offset, limit);
     }
     
     public async Task<bool> RemoveAllFromFavourites(User user)
     {
         if (user == null ||
             !_db.UserItems
-                .Include(ui => ui.User)
-                .Include(ui => ui.Item)
-                .Any(x => x.User.Id == user.Id))
+                .Any(x => x.UserId == user.Id))
         {
             return false;
         }
         
         
-        _db.UserItems.RemoveRange(_db.UserItems.Include(ui => ui.User).Where(x => x.Id == user.Id));
+        _db.UserItems.RemoveRange(_db.UserItems.Where(x => x.UserId == user.Id));
         await _db.SaveChangesAsync();
-        user.Favourites = (await this.GetById(user.Id))!.Favourites;
+
+        return true;
+    }
+    
+    public async Task<bool> IsOnFavourites(User user, Item item)
+    {
+        return _db.UserItems.Any(x => x.ItemId == item.Id && x.UserId == user.Id);
+    }
+
+    public async Task<bool> SetNotificationToken(User user, string token)
+    {
+        if (token == null || user == null)
+        {
+            return false;
+        }
+
+        user.NotificationToken = token;
+
+        _db.Users.Update(user);
+        await _db.SaveChangesAsync();
 
         return true;
     }

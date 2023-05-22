@@ -34,8 +34,8 @@ public class SubscriptionRepository : ISubscriptionRepository
         var subscription = new Subscription()
         {
             User = user,
-            ExpireDate = subscriptionDate.Add(duration),
-            SubDate = DateTime.Today
+            ExpireDate = subscriptionDate.Add(duration).ToUniversalTime(),
+            SubDate = DateTime.Today.ToUniversalTime()
         };
 
         _db.Subscriptions.Add(subscription);
