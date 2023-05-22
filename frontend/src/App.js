@@ -60,7 +60,6 @@ function App() {
 
     if (jwt) {
       fetchUser(jwt).then(user => {
-        console.log('kek');
         setUser({
           jwt,
           id: user.id,

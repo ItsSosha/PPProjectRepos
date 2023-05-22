@@ -32,7 +32,7 @@ const Filters = ({ onFilter, onParamsChange, values, onCheckChange }) => {
         <TextField
           name="priceFrom"
           onChange={e => onParamsChange(e)}
-          value={values.priceFrom}
+          value={values.priceFrom ?? ''}
           type="number"
           mb={1}
           variant="outlined"
@@ -50,7 +50,7 @@ const Filters = ({ onFilter, onParamsChange, values, onCheckChange }) => {
         <TextField
           name="PriceTo"
           onChange={e => onParamsChange(e)}
-          value={values.PriceTo}
+          value={values.PriceTo ?? ''}
           type="number"
           mb={1}
           variant="outlined"

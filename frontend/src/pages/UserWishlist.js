@@ -13,8 +13,8 @@ import { useAuthContext } from "../auth/auth";
 const PER_ROW = 4;
 const ROWS = 2;
 
-const fetchUserFavourites = async id => {
-  const response = await fetch(`https://pricely.tech/api/Favourites?userId=${id}`);
+const fetchUserFavourites = async (id, offset, limit) => {
+  const response = await fetch(`https://pricely.tech/api/Favourites/getPaginated?userId=${id}&offset=${offset}&limit=${limit}`);
   return await response.json();
 }
 
@@ -38,22 +38,22 @@ const UserWishlist = (props) => {
 
   useEffect(() => {
     if (user) {
-      fetchUserFavourites(user.id).then(data => {
-        const actualData = data.map(elem => {
+      setLoading(true);
+      fetchUserFavourites(user.id, (page - 1) * PER_ROW * ROWS, PER_ROW * ROWS).then(data => {
+        const actualData = data.result.map(elem => {
           return elem.item;
         })
         setFavourites(actualData);
         setLoading(false);
       })
     }
-  }, [])
+  }, [page])
 
   const handleFavouritesDelete = () => {
     deleteAllFavourites(user?.jwt);
     setFavourites([]);
   }
 
-  console.log(favourites);
   return (
     <>
       <Box display="flex" justifyContent="space-between" sx={{

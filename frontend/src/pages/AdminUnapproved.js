@@ -11,6 +11,10 @@ import Paper from '@mui/material/Paper';
 import { Button } from "@mui/material";
 import { useState } from "react";
 
+// const fetchUnapprovedItems = async () => {
+//     const data = await fetch('https://pricely.tech/api/Item/getAllNotApproved/');
+// }
+
 const AdminUnapproved = () => {
 
     const [rows, setRows] = useState(dummyAdminData.filter(item => !item.isApproved));
