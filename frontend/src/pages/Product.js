@@ -102,7 +102,7 @@ const Product = () => {
         setLoading(false);
       });
     });
-  }, [user])
+  }, [user, id])
 
   const handleFavouriteChange = () => {
     setIsFavourited(prevState => !prevState);
@@ -128,7 +128,7 @@ const View = ({product, handleFavouriteChange, isFavourited, user, recommended})
       </Typography>
       <ButtonsWrapper>
         <ButtonNavLink to="about" text="Про товар" />
-        <ButtonNavLink to="reviews" text="Відгуки"/>
+        <ButtonNavLink to="reviews?offset=0" text="Відгуки"/>
       </ButtonsWrapper>
       <ProductContent>
         <Outlet context={{ product }}/>

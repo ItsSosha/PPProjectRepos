@@ -18,6 +18,11 @@ const fetchUser = async (jwt) => {
   return await response.json();
 }
 
+const fetchUserPremium = async jwt => {
+  const response = await fetch(`https://pricely.tech/api/User/isUserPremium?jwt=${jwt}`);
+  return await response.json();
+}
+
 const fetchCategories = async () => {
   const response = await fetch('https://pricely.tech/api/Category');
   return await response.json();
@@ -34,17 +39,20 @@ function App() {
     setLoginModalOpen(false);
 
     fetchUser(resp.credential).then(user => {
-      setUser({
-        jwt: resp.credential,
-        id: user.id,
-        firstName: user.firstName,
-        lastName: user.surname,
-        email: user.email,
-        profilePictureURL: user.pictureLink.slice(0, user.pictureLink.indexOf("s96-c")) + "s256-c",
-        isAdmin: true
-      });
-      document.cookie = `jwt=${resp.credential}; max-age=604800;`;
-      navigate(`/users/${user.id}/about`);
+      fetchUserPremium(resp.credential).then(isPremium => {
+        setUser({
+          jwt: resp.credential,
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.surname,
+          email: user.email,
+          profilePictureURL: user.pictureLink.slice(0, user.pictureLink.indexOf("s96-c")) + "s256-c",
+          isAdmin: user.isAdmin,
+          isPremium
+        });
+        document.cookie = `jwt=${resp.credential}; max-age=604800;`;
+        navigate(`/users/${user.id}/about`);
+      })
     });
   }
 
@@ -65,15 +73,18 @@ function App() {
 
     if (jwt) {
       fetchUser(jwt).then(user => {
-        setUser({
-          jwt,
-          id: user.id,
-          firstName: user.firstName,
-          lastName: user.surname,
-          email: user.email,
-          profilePictureURL: user.pictureLink.slice(0, user.pictureLink.indexOf("s96-c")) + "s256-c",
-          isAdmin: true
-        });
+        fetchUserPremium(jwt).then(isPremium => {
+          setUser({
+            jwt,
+            id: user.id,
+            firstName: user.firstName,
+            lastName: user.surname,
+            email: user.email,
+            profilePictureURL: user.pictureLink.slice(0, user.pictureLink.indexOf("s96-c")) + "s256-c",
+            isAdmin: user.isAdmin,
+            isPremium
+          });
+        })
       });
     }
 

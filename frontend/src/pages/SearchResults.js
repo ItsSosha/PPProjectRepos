@@ -2,7 +2,7 @@ import styled from "styled-components";
 import Filters from "../components/Filters";
 import ProductsList from "../components/ProductsList/ProductList";
 import { useState } from "react";
-import { Stack, Pagination, CircularProgress } from "@mui/material";
+import { Stack, Pagination, CircularProgress, Typography } from "@mui/material";
 import { createSearchParams, useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
 
@@ -18,7 +18,7 @@ const PER_PAGE = 2;
 const fetchProducts = async (paramsObj) => {
   const params = createSearchParams(paramsObj);
   const response = await fetch(
-    `https://pricely.tech/api/Item/searchByName?${params}`
+    `https://pricely.tech/api/Item/${paramsObj.searchResult ? "searchByName" : "filterByCategory"}?${params}`
   );
   return response.json();
 };
@@ -26,7 +26,6 @@ const fetchProducts = async (paramsObj) => {
 const SearchResults = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [page, setPage] = useState(1);
   const [params, setParams] = useState({});
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,17 +33,15 @@ const SearchResults = () => {
   useEffect(() => {
     const searchObj = Object.fromEntries(searchParams.entries());
 
-    if (Object.entries(searchObj).length < 3) {
-      setParams({
-        searchResult: searchParams.get("searchResult") || null,
-        categoryName: searchParams.get("categoryName") || null,
-        priceFrom: searchParams.get("priceFrom") || "",
-        PriceTo: searchParams.get("PriceTo") || "",
-        isOnSale: searchParams.get("isOnSale") || false,
-        isFoxtrot: searchParams.get("isFoxtrot") || false,
-        isRozetka: searchParams.get("isRozetka") || false,
-      });
-    }
+    setParams({
+      searchResult: searchParams.get("searchResult") || null,
+      categoryName: searchParams.get("categoryName") || null,
+      priceFrom: searchParams.get("priceFrom") || "",
+      PriceTo: searchParams.get("PriceTo") || "",
+      isOnSale: searchParams.get("isOnSale") || false,
+      isFoxtrot: searchParams.get("isFoxtrot") || false,
+      isRozetka: searchParams.get("isRozetka") || false,
+    });
 
     setLoading(true);
     fetchProducts({
@@ -99,11 +96,7 @@ const SearchResults = () => {
         <CircularProgress color="secondary" size={80} />
       ) : (
         <View
-          page={
-            searchParams.get("offset") != 0
-              ? searchParams.get("offset") / (PER_PAGE * PER_ROW) + 1
-              : 1
-          }
+          page={searchParams.get("offset") / (PER_PAGE * PER_ROW) + 1}
           products={products}
           onPageChange={handlePageChange}
         />
@@ -115,7 +108,41 @@ const SearchResults = () => {
 const View = ({ products, page, onPageChange }) => {
   return (
     <Stack spacing={3} sx={{ width: "100%" }}>
-      <ProductsList
+      {products.total ? (
+        <>
+          <ProductsList
+          itemsPerRow={4}
+          rows={2}
+          data={products.result}
+          page={page}
+          />
+        <Pagination
+          count={Math.ceil(products.total / (PER_PAGE * PER_ROW))}
+          page={page}
+          onChange={(e, value) => onPageChange(value)}
+          sx={{
+            "& .MuiPagination-ul": {
+              justifyContent: "center",
+            },
+            "& .MuiPaginationItem-root": {
+              fontWeight: "700",
+              fontSize: "1rem",
+            },
+            "& .Mui-selected": {
+              textDecoration: "underline",
+              backgroundColor: "transparent",
+            },
+          }}
+          />
+        </>
+      ) : (
+        <Typography
+          component="h4"
+          variant="h4">
+            На жаль, жоден продукт не був знайдений за вашим запитом.
+        </Typography>
+      )}
+      {/* <ProductsList
         itemsPerRow={4}
         rows={2}
         data={products.result}
@@ -138,7 +165,7 @@ const View = ({ products, page, onPageChange }) => {
             backgroundColor: "transparent",
           },
         }}
-      />
+      /> */}
     </Stack>
   );
 };

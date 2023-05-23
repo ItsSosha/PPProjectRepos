@@ -48,11 +48,11 @@ const User = (props) => {
           maxWidth: "285px"
         }}>
           <Box my="20px" ml="20px">
-            <Typography variant="h5" fontWeight="700">
-              Username
+            <Typography variant="h6" fontWeight="700">
+              {user.firstName + " " + user.lastName}
             </Typography>
-            <Typography variant="body1">
-              User mail
+            <Typography variant="body2">
+              {user.email}
             </Typography>
           </Box>
           <StyledNavLink to={`/users/${id}/about`}>

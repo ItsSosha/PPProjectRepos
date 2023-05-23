@@ -48,12 +48,7 @@ const Header = ({ handleSidebarClick, setLoginModalOpen }) => {
     navigate({
       pathname: "search",
       search: `?${params}`,
-      
     });
-
-    // navigate("search", {
-    //   s
-    // })
   }
 
   return (

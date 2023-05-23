@@ -9,7 +9,10 @@ import { Link } from "react-router-dom";
 const SidebarItem = ({ icon, text }) => {
   return (
     <ListItem sx={{ py: 0, px: 1 }}>
-      <ListItemButton sx={{
+      <ListItemButton 
+      component={Link}
+      to={`search?categoryName=${text}&offset=0`}
+      sx={{
         borderRadius: "10px",
         px: 1,
         "&:hover": {

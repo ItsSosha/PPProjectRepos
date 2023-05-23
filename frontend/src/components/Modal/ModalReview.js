@@ -1,8 +1,21 @@
 import { Typography, TextField, Rating, Button } from "@mui/material";
+import { useState } from "react";
+import styled from "styled-components";
 
-const ModalReview = () => {
+const Form = styled.form`
+display: flex;
+flex-direction: column;
+row-gap: 8px;
+align-items: center;
+`
+
+const ModalReview = ({onReviewSubmit}) => {
+
+  const [reviewText, setReviewText] = useState('');
+  const [grade, setGrade] = useState(0);
+
   return (
-    <>
+    <Form onSubmit={e => onReviewSubmit(e, reviewText, grade)}>
       <Typography
         variant="h5"
         component="h5"
@@ -19,12 +32,16 @@ const ModalReview = () => {
         label="Введіть ваш відгук"
         minRows={10}
         color="secondary"
+        value={reviewText}
+        required
+        onChange={e => setReviewText(e.target.value)}
         sx={{
           minWidth: "75ch"
         }}
       />
-      <Rating size="large"/>
+      <Rating size="large" value={grade} onChange={e => setGrade(e.target.value)}/>
       <Button
+        type="submit"
         variant="contained"
         color="secondary"
         sx={{
@@ -35,7 +52,7 @@ const ModalReview = () => {
       >
         Додати відгук
       </Button>
-    </>
+    </Form>
   );
 };
 
