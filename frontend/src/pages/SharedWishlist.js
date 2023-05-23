@@ -17,7 +17,7 @@ const fetchFavourites = async (id, offset) => {
 }
 
 const SharedWishlist = (props) => {
-  const [favourites, setFavourites] = useState([]);
+  const [favourites, setFavourites] = useState({});
   const [username, setUsername] = useState('');
   const { id } = useParams();
   const navigate = useNavigate();

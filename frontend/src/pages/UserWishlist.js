@@ -4,117 +4,147 @@ import {
   Pagination,
   Stack,
   Typography,
-  CircularProgress
+  CircularProgress,
 } from "@mui/material";
 import ProductsList from "../components/ProductsList/ProductList";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "../auth/auth";
 import { FacebookRounded } from "@mui/icons-material";
+import { useSearchParams } from "react-router-dom";
 
 const PER_ROW = 4;
 const ROWS = 2;
 
-const fetchUserFavourites = async (id, offset, limit) => {
-  const response = await fetch(`https://pricely.tech/api/Favourites/getPaginated?userId=${id}&offset=${offset}&limit=${limit}`);
+const fetchUserFavourites = async (id, offset) => {
+  const response = await fetch(`https://pricely.tech/api/Favourites/getPaginated?userId=${id}&offset=${offset ?? 0}&limit=${PER_ROW * ROWS}`);
+  
+  if (!response.ok) {
+    throw new Error();
+  }
+
   return await response.json();
 }
 
 const deleteAllFavourites = async (jwt) => {
-  const response = await fetch(`https://pricely.tech/api/Favourites/deleteAll`, {
-    method: "DELETE",
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(jwt)
-  })
+  const response = await fetch(
+    `https://pricely.tech/api/Favourites/deleteAll`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(jwt),
+    }
+  );
 
   return response;
-}
+};
 
 const UserWishlist = (props) => {
-  const [favourites, setFavourites] = useState([]);
+  const [favourites, setFavourites] = useState({});
   const [page, setPage] = useState(1);
-  const [loading , setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const { user } = useAuthContext();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     if (user) {
       setLoading(true);
-      fetchUserFavourites(user.id, (page - 1) * PER_ROW * ROWS, PER_ROW * ROWS).then(data => {
-        const actualData = data.result.map(elem => {
+      fetchUserFavourites(
+        user.id,
+        searchParams.get('offset')
+      ).then((data) => {
+        const actualData = data.result.map((elem) => {
           return elem.item;
-        })
-        setFavourites(actualData);
+        });
+        setFavourites({data: actualData, total: data.total});
         setLoading(false);
-      })
+      });
     }
-  }, [page])
+  }, [searchParams]);
 
   const handleFavouritesDelete = () => {
     deleteAllFavourites(user?.jwt);
     setFavourites([]);
+  };
+
+  const handlePageChange = page => {
+    setSearchParams({
+      offset: (page - 1) * PER_ROW * ROWS
+    })
   }
 
   return (
     <>
-      <Box display="flex" justifyContent="space-between" sx={{
-        marginBottom: "2rem"
-      }}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        sx={{
+          marginBottom: "2rem",
+        }}
+      >
         <Typography variant="h4" fontWeight="700">
           Список бажань
         </Typography>
         <Box display="flex" alignItems="center" columnGap={3}>
-          <Button 
-            href={`https://www.facebook.com/sharer/sharer.php?u=https://pricely.tech/sharedWishlist/${user.id}?` + new URLSearchParams({
-              offset: 0
-            })}
+          <Button
+            href={
+              `https://www.facebook.com/sharer/sharer.php?u=https://pricely.tech/sharedWishlist/${user.id}?` +
+              new URLSearchParams({
+                offset: 0,
+              })
+            }
             target="_blank"
             variant="contained"
             color="secondary"
-            sx={{ color: "#FFF" }}>
+            sx={{ color: "#FFF" }}
+          >
             Поділитись списком
             <FacebookRounded sx={{ marginInlineStart: "0.4em" }} />
           </Button>
-        <Button variant="outlined" color="secondary" onClick={handleFavouritesDelete}>
-          Видалити всі
-        </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={handleFavouritesDelete}
+          >
+            Видалити всі
+          </Button>
         </Box>
       </Box>
-      {(favourites.length > 0) ?
+      {favourites.data?.length > 0 && !loading ? (
         <>
-        <ProductsList
-          data={favourites}
-          itemsPerRow={PER_ROW}
-          rows={ROWS}
-          page={page}
-        />
-        <Stack alignItems="center" mt={2}>
-        <Pagination
-            count={Math.ceil(favourites.length / (PER_ROW * ROWS))}
-            page={page}
-            onChange={(e, value) => setPage(value)}
-            sx={{
-              justifyContent: "center",
-              "& .MuiPaginationItem-root": {
-                fontWeight: "700",
-                fontSize: "1rem",
-              },
-              "& .Mui-selected" : {
-                textDecoration: "underline",
-                backgroundColor: "transparent",
-              }
-            }}
+          <ProductsList
+            data={favourites.data}
+            itemsPerRow={PER_ROW}
           />
-        </Stack>
-        </> :
-        loading ?
-        <CircularProgress color="secondary" size={80}/> :
+          <Stack alignItems="center" mt={2}>
+            <Pagination
+              count={Math.ceil(favourites.total / (ROWS * PER_ROW))}
+              page={searchParams.get("offset") / (ROWS * PER_ROW) + 1}
+              onChange={(e, value) => handlePageChange(value)}
+              sx={{
+                justifyContent: "center",
+                "& .MuiPaginationItem-root": {
+                  fontWeight: "700",
+                  fontSize: "1rem",
+                },
+                "& .Mui-selected": {
+                  textDecoration: "underline",
+                  backgroundColor: "transparent",
+                },
+              }}
+            />
+          </Stack>
+        </>
+      ) : loading ? (
+        <CircularProgress color="secondary" size={80} />
+      ) : (
         <Typography variant="h4">
           На даний момент ваш список бажань пустий
-        </Typography>}
+        </Typography>
+      )}
     </>
-  )
+  );
 };
-
 
 export default UserWishlist;

@@ -8,7 +8,7 @@ import {
   Grid,
   TextField,
   InputAdornment,
-  Button
+  Button,
 } from "@mui/material";
 
 import Logo from "./Logo";
@@ -25,43 +25,43 @@ const GridItemContainer = styled.div`
 `;
 
 const Form = styled.form`
-width: 80%;
-`
+  width: 80%;
+`;
 
 const Header = ({ handleSidebarClick, setLoginModalOpen }) => {
   const { user } = useAuthContext();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = e => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (!search) {
       return;
     }
 
     const params = createSearchParams({
       searchResult: search,
-      offset: 0
+      offset: 0,
     });
 
     navigate({
       pathname: "search",
       search: `?${params}`,
     });
-  }
+  };
 
   return (
     <AppBar
       sx={{
-        boxShadow: 'none',
-        borderBottom: '1px rgba(0, 0, 0, 0.2) solid',
-        marginBottom: '20px'
+        boxShadow: "none",
+        borderBottom: "1px rgba(0, 0, 0, 0.2) solid",
+        marginBottom: "20px",
       }}
-      position="sticky">
+      position="sticky"
+    >
       <Container maxWidth="xl">
-        <Toolbar
-          sx={{py: 1}}>
+        <Toolbar sx={{ py: 1 }}>
           <Grid container justifyItems="center" alignItems="center">
             <Grid item xs={1}>
               <GridItemContainer>
@@ -79,20 +79,23 @@ const Header = ({ handleSidebarClick, setLoginModalOpen }) => {
               <GridItemContainer>
                 <Form onSubmit={handleSubmit}>
                   <TextField
-                  variant="outlined"
-                  label="Search"
-                  size="small"
-                  color="secondary"
-                  onChange={e => setSearch(e.target.value)}
-                  value={search}
-                  sx={{
-                      width: '100%'
+                    variant="outlined"
+                    label="Search"
+                    size="small"
+                    color="secondary"
+                    onChange={(e) => setSearch(e.target.value)}
+                    value={search}
+                    sx={{
+                      width: "100%",
                     }}
-                  InputProps={{endAdornment: (
-                      <InputAdornment position="end">
-                        <Search />
-                      </InputAdornment>)}}>
-                  </TextField>
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <Search />
+                        </InputAdornment>
+                      ),
+                    }}
+                  ></TextField>
                 </Form>
               </GridItemContainer>
             </Grid>
@@ -100,9 +103,9 @@ const Header = ({ handleSidebarClick, setLoginModalOpen }) => {
               <GridItemContainer>
                 <IconButton
                   onClick={user ? () => {} : () => setLoginModalOpen(true)}
-                  component={(user) ? Link : Button}
-                  to={`/users/${user?.id}/about`}>
-                  
+                  component={user ? Link : Button}
+                  to={`/users/${user?.id}/about`}
+                >
                   <Person sx={{ color: "rgba(0, 0, 0, 1)" }} />
                 </IconButton>
               </GridItemContainer>
@@ -111,8 +114,9 @@ const Header = ({ handleSidebarClick, setLoginModalOpen }) => {
               <GridItemContainer>
                 <IconButton
                   component={Link}
-                  disabled={(user) ? false : true}
-                  to={`/users/${user?.id}/wishlist`}>
+                  disabled={user ? false : true}
+                  to={`/users/${user?.id}/wishlist`}
+                >
                   <StarOutlineRounded sx={{ color: "rgba(0, 0, 0, 1)" }} />
                 </IconButton>
               </GridItemContainer>
