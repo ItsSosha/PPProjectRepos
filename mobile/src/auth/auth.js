@@ -2,6 +2,8 @@ import { useRouter, useSegments } from "expo-router";
 import { useState, useEffect, useContext, createContext } from "react";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
+import JWT from 'expo-jwt';
+import UserService from "../API/UserService";
 
 const AuthContext = createContext(null);
 
@@ -56,10 +58,15 @@ export function AuthProvider(props) {
         throw new Error("Can't fetch user info");
       }
 
-      const user = await response.json();
-      setUser(user);
+      const googleUser = await response.json();
+      const key = "an exceptionally secret key";
+      const jwt = JWT.encode(googleUser, key, { algorithm: "HS256" });
 
+      const user = await UserService.get(jwt);
+      setUser(user);
+      
     } catch (error) {
+      console.log(error)
       setUser(null);
     }
   };

@@ -6,10 +6,9 @@ import {
   IconButton,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
-import categories from "./Categories";
 import SidebarItem from "./SidebarItem";
 
-const Sidebar = ({ isSidebarOpen, setSidebarOpen }) => {
+const Sidebar = ({ isSidebarOpen, setSidebarOpen, categories }) => {
   return (
     <Drawer
       anchor="left"
@@ -50,7 +49,7 @@ const Sidebar = ({ isSidebarOpen, setSidebarOpen }) => {
         </Box>
         <List>
           {categories.map(item => 
-            <SidebarItem text={item.text} icon={item.icon} key={item.text} />)}
+            <SidebarItem text={item.name} key={item.id} />)}
         </List>
       </Box>
     </Drawer>

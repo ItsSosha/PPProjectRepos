@@ -17,6 +17,10 @@ public class StoreContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // modelBuilder.Entity<Category>()
+        //     .HasMany(p => p.RawCategories)
+        //     .WithOne(t => t.Category)
+        //     .OnDelete(DeleteBehavior.SetNull);
     }
     //entities
     public DbSet<Store> Stores { get; set; }
