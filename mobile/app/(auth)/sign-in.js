@@ -1,5 +1,7 @@
+import * as Notifications from 'expo-notifications';
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useAuth } from "../../src/auth/auth";
+import { schedulePushNotification } from '../../src/auth/auth'; 
 
 const styles = StyleSheet.create(
   {
@@ -27,6 +29,14 @@ const styles = StyleSheet.create(
   }
 )
 
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
 export default function SignIn() {
   const { signIn } = useAuth();
 
@@ -41,6 +51,13 @@ export default function SignIn() {
       >
         <Text style={styles.typography.buttonText}>
           Continue with Google
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={async () => {
+        await schedulePushNotification();
+        }}>
+        <Text>
+          Schedule push notification
         </Text>
       </TouchableOpacity>
     </View>
