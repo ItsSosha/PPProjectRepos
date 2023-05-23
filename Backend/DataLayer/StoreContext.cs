@@ -34,4 +34,5 @@ public class StoreContext : DbContext
     public DbSet<Specification> Specifications { get; set; }
     public DbSet<Subscription> Subscriptions { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<Order> Orders { get; set; }
 }

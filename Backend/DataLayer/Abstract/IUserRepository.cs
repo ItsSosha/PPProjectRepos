@@ -14,4 +14,7 @@ public interface IUserRepository
     Task<bool> RemoveAllFromFavourites(User user);
     Task<bool> SetNotificationToken(User user, string token);
     Task<bool> IsOnFavourites(User user, Item item);
+    Task<Order?> CreateOrder(User? user);
+    Task<Order?> GetOrderById(long id);
+    Task<bool> UpdateOrder(Order order);
 }

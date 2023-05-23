@@ -208,4 +208,40 @@ public class UserRepository : IUserRepository
 
         return true;
     }
+
+    public async Task<Order?> CreateOrder(User? user)
+    {
+        if (user == null)
+        {
+            return null;
+        }
+    
+        _db.Orders.Add(new Order
+        {
+            UserId = user.Id,
+            Used = false
+        });
+        await _db.SaveChangesAsync();
+    
+        var order = await _db.Orders.OrderBy(x => x.Id).LastOrDefaultAsync(x => x.UserId == user.Id);
+    
+        return order;
+    }
+
+    public async Task<Order?> GetOrderById(long id)
+    {
+        return await _db.Orders.Include(x => x.User).FirstOrDefaultAsync(x => x.Id == id);
+    }
+
+    public async Task<bool> UpdateOrder(Order order)
+    {
+        if (order == null)
+        {
+            return false;
+        }
+        
+        _db.Orders.Update(order);
+        await _db.SaveChangesAsync();
+        return true;
+    }
 }
