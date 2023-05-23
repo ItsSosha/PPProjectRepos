@@ -124,8 +124,9 @@ public class ItemRepository : IItemRepository
             .Include(x => x.RawItem)
             .ThenInclude(x => x.RawCategory)
             .ThenInclude(x => x.Category)
+            .Where(i => i.Id != item.Id)
             .Count(c => c.RawItem.RawCategory.Category != null && (item.RawItem.RawCategory.Category == null || c.RawItem.RawCategory.Category.Id == item.RawItem.RawCategory.Category.Id));
-        var startIndex = random.Next(itemsLength - 5);
+        var startIndex = random.Next(itemsLength - 5 >= 0 ? itemsLength - 5 : 0);
 
         return await _db.Items
             .Include(i => i.RawItem)

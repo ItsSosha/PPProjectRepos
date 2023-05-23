@@ -1,10 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Core;
 using DataLayer.Abstract;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackendAPI.Controllers
@@ -48,7 +42,7 @@ namespace BackendAPI.Controllers
         [Route(("delete/{reviewId}"))]
         public async Task<IActionResult> DeleteReview([FromBody] string jwt, long reviewId)
         {
-            var currentUser = await _userRepository.GetOrRegisterUser(jwt); // Получаем текущего пользователя
+            var currentUser = await _userRepository.GetOrRegisterUser(jwt); 
 
             if (currentUser != null)
             {
@@ -70,12 +64,7 @@ namespace BackendAPI.Controllers
         public async Task<IActionResult> GetReviewsForItem(long itemId, int offset = 0, int limit = Int32.MaxValue)
         {
             var reviewsPage = await _reviewRepository.GetAllReviews(itemId, offset, limit);
-
-            if (reviewsPage.Result.Count == 0)
-            {
-                return NotFound();
-            }
-
+            
             return Ok(reviewsPage);
         }
         
