@@ -77,7 +77,7 @@ const Home = (props) => {
           <View style={styles.layout.profileImageContainer}>
             <Image
               source={{
-                uri: user.picture.slice(0, user.picture.indexOf("s96-c")) + "s256-c"
+                uri: user.pictureLink.slice(0, user.pictureLink.indexOf("s96-c")) + "s256-c"
               }}
               style={{
                 height: 200,

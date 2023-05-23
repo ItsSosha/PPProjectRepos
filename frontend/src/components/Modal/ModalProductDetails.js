@@ -8,7 +8,7 @@ justify-items: start;
 width: 100%;
 `
 
-const ModalProductDetails = ({ product, onItemChange}) => {
+const ModalProductDetails = ({ product, onItemChange }) => {
 
   if (!product) {
     return null;
@@ -28,7 +28,7 @@ const ModalProductDetails = ({ product, onItemChange}) => {
         </Typography>
         <Box 
           component="img"
-          src={product.vendorIcon}
+          src={product.rawCategory.store.iconURL}
           sx={{
             height: '2em',
           }}
@@ -61,7 +61,7 @@ const ModalProductDetails = ({ product, onItemChange}) => {
           color="secondary"
           align="left"
         >
-          <Link href={product.rawItemUrl} color="inherit">Посилання</Link>
+          <Link href={product.rawItemURL} color="inherit">Посилання</Link>
         </Typography>
       </ProductRow>
       <ProductRow>
@@ -76,7 +76,7 @@ const ModalProductDetails = ({ product, onItemChange}) => {
           color="secondary"
           align="left"
         >
-          {product.rawCaterogy}
+          {product.rawCategory.parsedName}
         </Typography>
       </ProductRow>
       <ProductRow>

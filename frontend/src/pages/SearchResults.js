@@ -17,13 +17,13 @@ const PER_PAGE = 2;
 
 const fetchProducts = async (paramsObj) => {
   const params = createSearchParams(paramsObj);
-  const response = await fetch(`https://pricely.tech/api/Item/searchByName?${params}`);
+  const response = await fetch(
+    `https://pricely.tech/api/Item/searchByName?${params}`
+  );
   return response.json();
-}
-
+};
 
 const SearchResults = () => {
-
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [page, setPage] = useState(1);
@@ -36,84 +36,111 @@ const SearchResults = () => {
 
     if (Object.entries(searchObj).length < 3) {
       setParams({
-        searchResult: searchParams.get('searchResult') || null,
-        categoryName: searchParams.get('categoryName') || null,
-        priceFrom: searchParams.get('priceFrom') || '',
-        PriceTo: searchParams.get('PriceTo') || '',
-        isOnSale: searchParams.get('isOnSale') || false,
-        isFoxtrot: searchParams.get('isFoxtrot') || false,
-        isRozetka: searchParams.get('isRozetka') || false,
-        limit: PER_PAGE * PER_ROW,
+        searchResult: searchParams.get("searchResult") || null,
+        categoryName: searchParams.get("categoryName") || null,
+        priceFrom: searchParams.get("priceFrom") || "",
+        PriceTo: searchParams.get("PriceTo") || "",
+        isOnSale: searchParams.get("isOnSale") || false,
+        isFoxtrot: searchParams.get("isFoxtrot") || false,
+        isRozetka: searchParams.get("isRozetka") || false,
       });
-  
-      const page = searchParams.get('offset') / (PER_PAGE * PER_ROW);
-  
-      setPage(page ? page : 1);
     }
 
     setLoading(true);
     fetchProducts({
       ...searchObj,
-      offset: (page - 1) * PER_PAGE * PER_ROW,
-      limit: PER_PAGE * PER_ROW
-    }).then(data => {
+      offset: searchParams.get("offset"),
+      limit: PER_PAGE * PER_ROW,
+    }).then((data) => {
       setProducts(data);
       setLoading(false);
     });
-  }, [searchParams])
+  }, [searchParams]);
 
-
-  const handleParamsChange = e => {
-    setParams(prevParams => ({
+  const handleParamsChange = (e) => {
+    setParams((prevParams) => ({
       ...prevParams,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
-  }
+  };
 
-  const handleCheckChange = e => {
-    setParams(prevParams => ({
+  const handleCheckChange = (e) => {
+    setParams((prevParams) => ({
       ...prevParams,
-      [e.target.name]: e.target.checked
+      [e.target.name]: e.target.checked,
     }));
-  }
+  };
 
-  const handleFilter = e => {
+  const handleFilter = (e) => {
     e.preventDefault();
-    setSearchParams(Object.fromEntries(Object.entries(params).filter(param => param[1])));
-  }
+    setSearchParams(prevParams => ({
+      ...Object.fromEntries(Object.entries(params).filter((param) => param[1])),
+      offset: 0
+    })
+    );
+  };
+
+  const handlePageChange = (page) => {
+    setSearchParams((prevSearchParams) => ({
+      ...Object.fromEntries(prevSearchParams.entries()),
+      offset: (page - 1) * PER_ROW * PER_PAGE,
+    }));
+  };
 
   return (
     <SearchResultsWrapper>
-        <Filters onFilter={handleFilter} values={params} onCheckChange={handleCheckChange} onParamsChange={handleParamsChange} />
-        {loading ? <CircularProgress color="secondary" size={80}/> : <View page={page} products={products} handlePageChange={setPage}/>}
+      <Filters
+        onFilter={handleFilter}
+        values={params}
+        onCheckChange={handleCheckChange}
+        onParamsChange={handleParamsChange}
+      />
+      {loading ? (
+        <CircularProgress color="secondary" size={80} />
+      ) : (
+        <View
+          page={
+            searchParams.get("offset") != 0
+              ? searchParams.get("offset") / (PER_PAGE * PER_ROW) + 1
+              : 1
+          }
+          products={products}
+          onPageChange={handlePageChange}
+        />
+      )}
     </SearchResultsWrapper>
   );
 };
 
-const View = ({products, page, handlePageChange}) => {
+const View = ({ products, page, onPageChange }) => {
   return (
-    <Stack spacing={3} sx={{width: '100%'}}>
-      <ProductsList itemsPerRow={4} rows={2} data={products.result} page={page}/>
+    <Stack spacing={3} sx={{ width: "100%" }}>
+      <ProductsList
+        itemsPerRow={4}
+        rows={2}
+        data={products.result}
+        page={page}
+      />
       <Pagination
-          count={Math.ceil(products.total / (PER_PAGE * PER_ROW))}
-          page={page}
-          onChange={(e, value) => handlePageChange(value)}
-          sx={{
-            "& .MuiPagination-ul": {
-              justifyContent: "center"
-            },
-            "& .MuiPaginationItem-root": {
-              fontWeight: "700",
-              fontSize: "1rem",
-            },
-            "& .Mui-selected" : {
-              textDecoration: "underline",
-              backgroundColor: "transparent",
-            }
-          }}
-        />
+        count={Math.ceil(products.total / (PER_PAGE * PER_ROW))}
+        page={page}
+        onChange={(e, value) => onPageChange(value)}
+        sx={{
+          "& .MuiPagination-ul": {
+            justifyContent: "center",
+          },
+          "& .MuiPaginationItem-root": {
+            fontWeight: "700",
+            fontSize: "1rem",
+          },
+          "& .Mui-selected": {
+            textDecoration: "underline",
+            backgroundColor: "transparent",
+          },
+        }}
+      />
     </Stack>
-  )
-}
+  );
+};
 
 export default SearchResults;

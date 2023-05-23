@@ -37,7 +37,7 @@ public class ReviewRepository: IReviewRepository
         return false;
     }
 
-    public async Task<bool> DeleteReview(int reviewId, User user)
+    public async Task<bool> DeleteReview(long reviewId, User user)
     {
         // get review by id
         var review = await _db.Reviews.FirstOrDefaultAsync(r => r.Id == reviewId);

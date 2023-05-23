@@ -24,8 +24,17 @@ namespace BackendAPI.Controllers
             return Ok(resultPage);
         }
 
+        [HttpGet]
+        [Route("getAllRawCategories")]
+        public async Task<ActionResult<IList<RawCategory>>> GetAllRawCategories()
+        {
+            var result = await _categoryRepository.GetAllRawCategories();
+
+            return Ok(result);
+        }
+
         [HttpGet("{categoryId}")]
-        public async Task<ActionResult<Category>> GetCategoryById(int categoryId)
+        public async Task<ActionResult<Category>> GetCategoryById(long categoryId)
         {
             var category = await _categoryRepository.GetCategoryById(categoryId);
             if (category == null)
@@ -50,11 +59,11 @@ namespace BackendAPI.Controllers
                 return Ok();
             }
 
-            return BadRequest();
+            return NotFound();
         }
 
         [HttpDelete]
-        public async Task<ActionResult> DeleteCategory([FromBody]string jwt, int categoryId)
+        public async Task<ActionResult> DeleteCategory([FromBody]string jwt, long categoryId)
         {
             var user = await _userRepository.GetOrRegisterUser(jwt);
             if (user == null || !user.IsAdmin)

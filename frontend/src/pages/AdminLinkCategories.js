@@ -12,27 +12,54 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Button, TextField } from '@mui/material';
 
+const fetchCategories = async () => {
+    const response = await fetch('https://pricely.tech/api/Category');
+    return await response.json();
+}
+
+const fetchRawCategories = async () => {
+    const response = await fetch('https://pricely.tech/api/Category/getAllRawCategories');
+    return await response.json();
+}
+
+const updateRawCategory = async (categoryId, rawCategoryId) => {
+    const response = await fetch(`https://pricely.tech/api/Category/bindCategory?categoryId=${categoryId}&rawCategoryId=${rawCategoryId}`, {
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        method: 'POST'
+    });
+
+    if (!response.ok) {
+        throw new Error();
+    }
+
+    return await fetchRawCategories();
+}
+
 const AdminLinkCategories = () => {
 
-    const [rawCategories, setRawCategories] = useState(rawCategoriesSource);
+    const [rawCategories, setRawCategories] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [activeCategory, setActiveCategory] = useState(null);
 
     const handleCategoryChange = (e, category) => {
         e.preventDefault();
-        const copy = [...rawCategories];
-        const itemCopy = {...copy[activeCategory], category}
-        copy[activeCategory] = itemCopy;
-
-        setRawCategories(copy);
+        updateRawCategory(category, activeCategory?.id).then(setRawCategories);
         setActiveCategory(null);
     }
+
+    useEffect(() => {
+        fetchRawCategories().then(setRawCategories);
+        fetchCategories().then(setCategories);
+    }, [])
 
     return (
         <div>
             <Modal
                 open={activeCategory != null}
                 onModalClose={() => setActiveCategory(null)}>
-                <ModalEditRawCategory onCategoryChange={handleCategoryChange} defaultCategory={rawCategories[activeCategory]?.category}/>
+                <ModalEditRawCategory categories={categories} onCategoryChange={handleCategoryChange} defaultCategory={activeCategory?.category?.id}/>
             </Modal>
             <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -46,21 +73,21 @@ const AdminLinkCategories = () => {
                     <TableBody>
                     {rawCategories.map((rawCategory, index) => (
                         <TableRow
-                        key={rawCategory.name + rawCategories.category}
+                        key={rawCategory.id}
                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                         >
                         <TableCell component="th" scope="row">
                             {rawCategory.parsedName}
                         </TableCell>
                         <TableCell component="th" scope="row">
-                            {rawCategory.category ? rawCategory.category : <span style={{color: "red"}}>Відсутня</span>}
+                            {rawCategory.category?.name ? rawCategory.category?.name : <span style={{color: "red"}}>Відсутня</span>}
                         </TableCell>
                         <TableCell align="right">
                             <Button
                                 variant="contained"
                                 color="secondary"
                                 sx={{color: "#FFF"}}
-                                onClick={() => setActiveCategory(index)}>
+                                onClick={() => setActiveCategory(rawCategory)}>
                                     Редагувати
                             </Button>
                         </TableCell>

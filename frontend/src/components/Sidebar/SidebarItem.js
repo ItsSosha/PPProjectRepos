@@ -4,6 +4,7 @@ import {
   ListItemIcon,
   ListItemText
 } from "@mui/material"
+import { Link } from "react-router-dom";
 
 const SidebarItem = ({ icon, text }) => {
   return (
@@ -15,11 +16,11 @@ const SidebarItem = ({ icon, text }) => {
           backgroundColor: "rgba(255, 255, 255, 0.1)",
         }
       }}>
-        <ListItemIcon sx={{ 
+        {/* <ListItemIcon sx={{ 
           minWidth: "35px",
         }}>
           {icon}
-        </ListItemIcon>
+        </ListItemIcon> */}
         <ListItemText primary={text} />
       </ListItemButton>
     </ListItem>

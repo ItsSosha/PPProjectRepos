@@ -1,5 +1,5 @@
 import { useState } from "react";
-import categories from "../Sidebar/Categories";
+// import categories from "../Sidebar/Categories";
 import { Button, FormControl, InputLabel, Select, MenuItem, FormLabel } from "@mui/material";
 import styled from "styled-components";
 
@@ -10,9 +10,11 @@ column-gap: 1em;
 width: 40ch;
 `
 
-const ModalEditRawCategory = ({onCategoryChange, defaultCategory}) => {
+const ModalEditRawCategory = ({onCategoryChange, defaultCategory, categories}) => {
 
     const [selectedCategory, setSelectedCategory] = useState(defaultCategory);
+
+    console.log(categories);
 
     return (
         <Form onSubmit={e => onCategoryChange(e, selectedCategory)}>
@@ -21,7 +23,7 @@ const ModalEditRawCategory = ({onCategoryChange, defaultCategory}) => {
                 <Select
                     required
                     labelId="category"
-                    value={selectedCategory}
+                    value={selectedCategory ?? ''}
                     onChange={e => setSelectedCategory(e.target.value)}
                     label="Категорія"
                     sx={{
@@ -29,7 +31,7 @@ const ModalEditRawCategory = ({onCategoryChange, defaultCategory}) => {
                     }}>
                     {categories.map((category) => {
                         return (
-                            <MenuItem value={category.text}>{category.text}</MenuItem>
+                            <MenuItem value={category.id}>{category.name}</MenuItem>
                         )
                     })}
                 </Select>
