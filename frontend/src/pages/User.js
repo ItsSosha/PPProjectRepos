@@ -31,6 +31,11 @@ const User = (props) => {
   const { user, logout } = useAuthContext();
   const navigate = useNavigate();
 
+  if (!user) {
+    navigate('/');
+    return;
+  }
+
   const handleLogout = () => {
     document.cookie = `jwt=; max-age=-1;`;
 

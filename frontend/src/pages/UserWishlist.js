@@ -9,6 +9,7 @@ import {
 import ProductsList from "../components/ProductsList/ProductList";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "../auth/auth";
+import { FacebookRounded } from "@mui/icons-material";
 
 const PER_ROW = 4;
 const ROWS = 2;
@@ -62,9 +63,22 @@ const UserWishlist = (props) => {
         <Typography variant="h4" fontWeight="700">
           Список бажань
         </Typography>
+        <Box display="flex" alignItems="center" columnGap={3}>
+          <Button 
+            href={`https://www.facebook.com/sharer/sharer.php?u=https://pricely.tech/sharedWishlist/${user.id}?` + new URLSearchParams({
+              offset: 0
+            })}
+            target="_blank"
+            variant="contained"
+            color="secondary"
+            sx={{ color: "#FFF" }}>
+            Поділитись списком
+            <FacebookRounded sx={{ marginInlineStart: "0.4em" }} />
+          </Button>
         <Button variant="outlined" color="secondary" onClick={handleFavouritesDelete}>
           Видалити всі
         </Button>
+        </Box>
       </Box>
       {(favourites.length > 0) ?
         <>

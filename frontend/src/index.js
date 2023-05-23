@@ -103,7 +103,7 @@ const router = createBrowserRouter([
         element: <SearchResults />
       },
       {
-        path: "sharedwishlist/:id",
+        path: "sharedWishlist/:id",
         element: <SharedWishlist />
       }
     ]

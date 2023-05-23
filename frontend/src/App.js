@@ -50,7 +50,7 @@ function App() {
           isAdmin: user.isAdmin,
           isPremium
         });
-        document.cookie = `jwt=${resp.credential}; max-age=604800;`;
+        document.cookie = `jwt=${resp.credential}; max-age=3599;`;
         navigate(`/users/${user.id}/about`);
       })
     });

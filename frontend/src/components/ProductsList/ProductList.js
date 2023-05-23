@@ -11,12 +11,7 @@ const ProductsListWrapper = styled.div`
     align-items: center;
 `
 
-const ProductsList = ({data, itemsPerRow, page = 1, rows = 1}) => {
-
-    // const displayData = useMemo(() => {
-    //     return data.slice(itemsPerRow * rows * (page - 1), itemsPerRow * rows * page);
-    //     // eslint-disable-next-line
-    // }, [page, data]);
+const ProductsList = ({data, itemsPerRow}) => {
 
     return (
         <ProductsListWrapper itemsPerRow={itemsPerRow}>

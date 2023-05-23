@@ -10,7 +10,7 @@ import {
 
 import { Refresh } from "@mui/icons-material";
 
-const Filters = ({ onFilter, onParamsChange, values, onCheckChange }) => {
+const Filters = ({ onFilter, onParamsChange, values, onCheckChange, onFiltersReset }) => {
 
   const vendors = ["Rozetka", "Foxtrot"];
   return (
@@ -22,7 +22,7 @@ const Filters = ({ onFilter, onParamsChange, values, onCheckChange }) => {
       borderRadius="5px"
       alignSelf="start"
     >
-      <form onSubmit={onFilter}>
+      <form onSubmit={onFilter} onReset={onFiltersReset}>
         <Typography variant="h6" mb={2}>
           Ціна, &#8372;
         </Typography>

@@ -84,6 +84,14 @@ const SearchResults = () => {
     }));
   };
 
+  const handleFiltersReset = () => {
+    const query = searchParams.get('searchResult') ? 'searchResult' : 'categoryName';
+    setSearchParams(prevSearchParams => ({
+      offset: 0,
+      [query]: searchParams.get(query)
+    }))
+  }
+
   return (
     <SearchResultsWrapper>
       <Filters
@@ -91,6 +99,7 @@ const SearchResults = () => {
         values={params}
         onCheckChange={handleCheckChange}
         onParamsChange={handleParamsChange}
+        onFiltersReset={handleFiltersReset}
       />
       {loading ? (
         <CircularProgress color="secondary" size={80} />
