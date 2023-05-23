@@ -217,20 +217,15 @@ public class ItemRepository : IItemRepository
 
     public async Task<ResultPage<Item>> GetItemsByCategory(string categoryName, int priceFrom, int priceTo, bool isOnSale, bool isFoxtrot, bool isRozetka, int offset, int limit)
     {
-        /*var query = _db.Items
+        var query = _db.Items
             .Include(i => i.RawItem)
             .ThenInclude(c => c.RawCategory)
             .ThenInclude(rc => rc.Category)
             .Include(i => i.RawItem)
             .ThenInclude(c => c.RawCategory)
             .ThenInclude(rc => rc.Store)
-            .Where(c => c.RawItem.RawCategory.Category.Name == categoryName);*/
+            .Where(c => c.RawItem.RawCategory.Category.Name == categoryName);
         
-        var query = _db.Items
-            .Include(i => i.RawItem)
-            .ThenInclude(c => c.RawCategory)
-            .ThenInclude(s => s.Store)
-            .Where(c => c.RawItem.RawCategory.ParsedName == categoryName);
 
         if (priceFrom != 0)
         {
