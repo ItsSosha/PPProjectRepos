@@ -25,10 +25,11 @@ public class ReviewRepository: IReviewRepository
                 ItemId = itemId,
                 UserId = currentUser.Id,
                 Grade = grade,
-                ReviewText = reviewText
+                ReviewText = reviewText,
+                Date = DateTime.Now.ToUniversalTime()
             };
 
-            item.Reviews.Add(review);
+            _db.Reviews.Add(review);
             await _db.SaveChangesAsync();
 
             return true;

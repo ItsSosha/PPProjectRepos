@@ -1,9 +1,11 @@
 import { useRouter, useSegments } from "expo-router";
-import { useState, useEffect, useContext, createContext } from "react";
+import { useState, useEffect, useContext, createContext, useRef } from "react";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import JWT from 'expo-jwt';
 import UserService from "../API/UserService";
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
 
 const AuthContext = createContext(null);
 
@@ -20,7 +22,7 @@ function useProtectedRoute(user) {
     if (!user && !inAuthGroup) {
       router.replace("/sign-in");
     } else if (user && inAuthGroup) {
-      router.replace("/users/0/about");
+      router.replace(`/users/${user.id}/about`);
     }
   }, [user, segments]);
 }
@@ -30,6 +32,11 @@ WebBrowser.maybeCompleteAuthSession();
 export function AuthProvider(props) {
   const [token, setToken] = useState();
   const [user, setUser] = useState();
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
+  const router = useRouter();
+  
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     androidClientId: "831759783769-3r713gngbaj289trqp2s5gi14jg3fu90.apps.googleusercontent.com",
@@ -44,6 +51,8 @@ export function AuthProvider(props) {
       getUserInfo();
     }
   }, [response, token]);
+
+  
 
   const getUserInfo = async () => {
     try {
@@ -62,16 +71,41 @@ export function AuthProvider(props) {
       const key = "an exceptionally secret key";
       const jwt = JWT.encode(googleUser, key, { algorithm: "HS256" });
 
-      const user = await UserService.get(jwt);
+      let user = await UserService.get(jwt);
+
+      const notificationToken = await registerForPushNotificationsAsync();
+
+      if (user.notificationToken !== notificationToken) {
+        UserService.setNotificationToken(user.jwt, notificationToken);
+        user = await UserService.get(user.jwt);
+      }
+
+      notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+        setNotification(notification);
+      });
+  
+      responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+        const itemId = response.notification.request.content.data.itemId
+        router.replace(`/products/${itemId}`);
+      });
+
       setUser(user);
-      
+
     } catch (error) {
       console.log(error)
       setUser(null);
     }
   };
 
+
   useProtectedRoute(user);
+
+  useEffect(() => {
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -84,4 +118,46 @@ export function AuthProvider(props) {
       {props.children}
     </AuthContext.Provider>
   );
+}
+
+async function registerForPushNotificationsAsync() {
+  let token;
+
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
+    });
+  }
+
+  if (Device.isDevice) {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      alert('Failed to get push token for push notification!');
+      return;
+    }
+    token = (await Notifications.getExpoPushTokenAsync()).data;
+  } else {
+    alert('Must use physical device for Push Notifications');
+  }
+
+  return token;
+}
+
+export async function schedulePushNotification() {
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: "You've got mail! 📬",
+      body: 'Here is the notification body',
+      data: { data: 'goes here' },
+    },
+    trigger: { seconds: 2 },
+  });
 }

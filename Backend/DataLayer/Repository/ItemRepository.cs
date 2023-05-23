@@ -120,24 +120,23 @@ public class ItemRepository : IItemRepository
     public async Task<IList<Item>> GetRecommended(Item item)
     {
         Random random = new Random();
-        var itemsLength = _db.RawItems.Count();
-        var startIndex = random.Next(itemsLength - 5);
+        var itemsLength = _db.Items
+            .Include(x => x.RawItem)
+            .ThenInclude(x => x.RawCategory)
+            .ThenInclude(x => x.Category)
+            .Where(i => i.Id != item.Id)
+            .Count(c => c.RawItem.RawCategory.Category != null && (item.RawItem.RawCategory.Category == null || c.RawItem.RawCategory.Category.Id == item.RawItem.RawCategory.Category.Id));
+        var startIndex = random.Next(itemsLength - 5 >= 0 ? itemsLength - 5 : 0);
 
         return await _db.Items
-            .Include(ri => ri.RawItem)
+            .Include(i => i.RawItem)
+            .ThenInclude(ri => ri.RawCategory)
+            .ThenInclude(rc => rc.Category)
+            .Where(i => i.RawItem.RawCategory.Category != null && (item.RawItem.RawCategory.Category == null || i.RawItem.RawCategory.Category.Id == item.RawItem.RawCategory.Category.Id))
+            .Where(i => i.Id != item.Id)
             .Skip(startIndex)
             .Take(5)
-            .Where(c => c.RawItem.RawCategory == item.RawItem.RawCategory)
             .ToListAsync();
-        
-        /*return await _db.Items
-            .Include(ri => ri.RawItem)
-            .ThenInclude(c => c.RawCategory)
-            .ThenInclude(c => c.Category)
-            .Skip(startIndex)
-            .Take(5)
-            .Where(c => c.RawItem.RawCategory.Category == item.RawItem.RawCategory.Category)
-            .ToListAsync();*/
     }
 
     public async Task<Item?> GetByIdAsync(long id)
@@ -149,7 +148,7 @@ public class ItemRepository : IItemRepository
         }
 
         var rawItem = await _db.RawItems.FirstOrDefaultAsync(x => x.Id == item.RawItemId);
-        var rawCategory = await _db.RawCategories.FirstOrDefaultAsync(x => x.Id == rawItem.RawCategoryId);
+        var rawCategory = await _db.RawCategories.Include(x => x.Category).FirstOrDefaultAsync(x => x.Id == rawItem.RawCategoryId);
         //var category = await _db.Categories.FirstOrDefaultAsync(x => x.Id == rawCategory.Category.Id);
         var store = await _db.Stores.FirstOrDefaultAsync(x => x.Id == rawCategory.StoreId);
 
@@ -217,20 +216,15 @@ public class ItemRepository : IItemRepository
 
     public async Task<ResultPage<Item>> GetItemsByCategory(string categoryName, int priceFrom, int priceTo, bool isOnSale, bool isFoxtrot, bool isRozetka, int offset, int limit)
     {
-        /*var query = _db.Items
+        var query = _db.Items
             .Include(i => i.RawItem)
             .ThenInclude(c => c.RawCategory)
             .ThenInclude(rc => rc.Category)
             .Include(i => i.RawItem)
             .ThenInclude(c => c.RawCategory)
             .ThenInclude(rc => rc.Store)
-            .Where(c => c.RawItem.RawCategory.Category.Name == categoryName);*/
+            .Where(c => c.RawItem.RawCategory.Category.Name == categoryName);
         
-        var query = _db.Items
-            .Include(i => i.RawItem)
-            .ThenInclude(c => c.RawCategory)
-            .ThenInclude(s => s.Store)
-            .Where(c => c.RawItem.RawCategory.ParsedName == categoryName);
 
         if (priceFrom != 0)
         {

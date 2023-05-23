@@ -9,4 +9,5 @@ public class Review : BaseEntity
     public User User { get; set; }
     public long UserId { get; set; }
     public string? ReviewText { get; set; }
+    public DateTime Date { get; set; }
 }

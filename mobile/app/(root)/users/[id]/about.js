@@ -88,7 +88,7 @@ const Home = (props) => {
           </View>
           <View style={styles.utils.center}>
             <Text style={styles.typography.userInfo.main}>
-              {user.name}
+              {`${user.firstName} ${user.surname}`}
             </Text>
             <Text style={styles.typography.userInfo.sub}>
               {user.email}

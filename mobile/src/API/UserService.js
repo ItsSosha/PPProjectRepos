@@ -12,4 +12,21 @@ export default class UserService {
         const jwtUser = {...user, jwt};
         return jwtUser;
     }
+
+    static async setNotificationToken(jwt, token) {
+        const resp = await fetch("https://pricely.tech/api/User/setNotificationToken?" + 
+        new URLSearchParams({ token: token }),
+        {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(jwt)
+        })
+
+        if (!resp.ok) {
+            console.log(resp);
+            throw new Error("Can't set user notification token");
+        }
+    }
 }
