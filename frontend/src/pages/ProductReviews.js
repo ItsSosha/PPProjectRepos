@@ -10,38 +10,62 @@ import {
   Typography,
   Pagination,
   Stack,
-  CircularProgress
+  CircularProgress,
 } from "@mui/material";
 import { useAuthContext } from "../auth/auth";
 import { useOutletContext, useSearchParams } from "react-router-dom";
 
 const ReviewsWrapper = styled.div`
-padding: 20px;
-display: flex;
-flex-direction: column;
-`
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+`;
 const PER_PAGE = 4;
 
 const fetchReviews = async (id, offset) => {
-  const response = await fetch(`https://pricely.tech/api/Review/get/${id}?offset=${offset}&limit=${PER_PAGE}`);
+  const response = await fetch(
+    `https://pricely.tech/api/Review/get/${id}?offset=${offset}&limit=${PER_PAGE}`
+  );
   return await response.json();
-}
+};
 
 const addReview = async (jwt, id, reviewtext, grade) => {
-  const response = await fetch(`https://pricely.tech/api/Review/add?itemId=${id}&reviewText=${reviewtext}&grade=${grade}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(jwt)
-  });
-  
+  const response = await fetch(
+    `https://pricely.tech/api/Review/add?itemId=${id}&reviewText=${reviewtext}&grade=${grade}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(jwt),
+    }
+  );
+
   if (!response.ok) {
     throw new Error();
   }
 
-  return await response;
-}
+  return await response.json();
+};
+
+const removeReview = async (jwt, reviewId) => {
+  const resp = await fetch(
+    `https://pricely.tech/api/Review/delete/${reviewId}`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(jwt),
+    }
+  );
+
+  if (!resp.ok) {
+    throw new Error();
+  }
+
+  return await resp.json();
+};
 
 const ProductReviews = () => {
   const [isModalOpened, setIsModalOpened] = useState(false);
@@ -54,37 +78,51 @@ const ProductReviews = () => {
   const handleReviewSubmit = (id, e, reviewtext, grade) => {
     e.preventDefault();
     setSearchParams({
-      offset: 0
-    })
+      offset: 0,
+    });
     addReview(user.jwt, id, reviewtext, grade).then(() => {
       setLoading(true);
-      fetchReviews(product.id, 0).then(data => {
+      fetchReviews(product.id, 0).then((data) => {
         setReviews(data);
         setLoading(false);
         setIsModalOpened(false);
-      })
-    })
-  }
+      });
+    });
+  };
 
   const handlePageChange = (page) => {
     setSearchParams((prevSearchParams) => ({
       ...Object.fromEntries(prevSearchParams.entries()),
       offset: (page - 1) * PER_PAGE,
     }));
-  }
+  };
 
   useEffect(() => {
     setLoading(true);
-    fetchReviews(product?.id, searchParams.get('offset')).then(data => {
+    fetchReviews(product?.id, searchParams.get("offset")).then((data) => {
       setLoading(false);
       setReviews(data);
     });
   }, [searchParams]);
 
+  const handleReviewDelete = async (jwt, reviewId) => {
+    await removeReview(jwt, reviewId);
+    setSearchParams((prevSearchParams) => ({
+      offset:
+        (prevSearchParams.offset - 1) % PER_PAGE === 0
+          ? prevSearchParams.offset - PER_PAGE
+          : prevSearchParams.offset,
+    }));
+  };
+
   return (
     <ReviewsWrapper>
       <Modal open={isModalOpened} onModalClose={() => setIsModalOpened(false)}>
-        <ModalReview onReviewSubmit={(e, reviewText, grade) => handleReviewSubmit(product?.id, e, reviewText, grade)} />
+        <ModalReview
+          onReviewSubmit={(e, reviewText, grade) =>
+            handleReviewSubmit(product?.id, e, reviewText, grade)
+          }
+        />
       </Modal>
       <Grid container mb={2}>
         <Grid item xs={6}>
@@ -101,31 +139,39 @@ const ProductReviews = () => {
             sx={{
               color: "#FFF",
               paddingX: "2.5em",
-              paddingY: "0.5em"
-            }}>
+              paddingY: "0.5em",
+            }}
+          >
             Залишити відгук
           </Button>
         </Grid>
       </Grid>
       {loading ? (
-        <CircularProgress color="secondary" size={80}/>
+        <CircularProgress color="secondary" size={80} />
       ) : (
         <View
           page={searchParams.get("offset") / PER_PAGE + 1}
           reviews={reviews}
-          onPageChange={handlePageChange}/>
+          onPageChange={handlePageChange}
+          user={user}
+          handleReviewDelete={handleReviewDelete}
+        />
       )}
     </ReviewsWrapper>
   );
 };
 
-const View = ({reviews, page, onPageChange}) => {
+const View = ({ reviews, page, onPageChange, user, handleReviewDelete }) => {
   return (
     <>
       {reviews.total != 0 ? (
         <>
           {/* <ReviewList reviews={reviews} perPage={PER_PAGE} page={page} /> */}
-          <ReviewList reviews={reviews.result} />
+          <ReviewList
+            reviews={reviews.result}
+            handleReviewDelete={handleReviewDelete}
+            user={user}
+          />
           <Stack alignItems="center" mt={2}>
             <Pagination
               count={Math.ceil(reviews.total / PER_PAGE)}
@@ -137,23 +183,21 @@ const View = ({reviews, page, onPageChange}) => {
                   fontWeight: "700",
                   fontSize: "1rem",
                 },
-                "& .Mui-selected" : {
+                "& .Mui-selected": {
                   textDecoration: "underline",
                   backgroundColor: "transparent",
-                }
+                },
               }}
             />
           </Stack>
         </>
       ) : (
-        <Typography
-        component="h4"
-        variant="h4">
+        <Typography component="h4" variant="h4">
           Продукт не має жодних відгуків.
         </Typography>
       )}
     </>
-  )
-}
+  );
+};
 
 export default ProductReviews;

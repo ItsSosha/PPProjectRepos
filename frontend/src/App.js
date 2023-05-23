@@ -5,7 +5,7 @@ import Footer from "./components/Footer";
 import Sidebar from "./components/Sidebar/Sidebar";
 import { useEffect, useState } from "react";
 import { AuthProvider } from "./auth/auth";
-import Modal from "./components/Modal/Modal"
+import Modal from "./components/Modal/Modal";
 import ModalAuth from "./components/Modal/ModalAuth";
 
 const fetchUser = async (jwt) => {
@@ -16,17 +16,26 @@ const fetchUser = async (jwt) => {
   }
 
   return await response.json();
-}
+};
 
-const fetchUserPremium = async jwt => {
-  const response = await fetch(`https://pricely.tech/api/User/isUserPremium?jwt=${jwt}`);
+const fetchUserPremium = async (jwt) => {
+  const response = await fetch(
+    `https://pricely.tech/api/User/isUserPremium?jwt=${jwt}`
+  );
   return await response.json();
-}
+};
+
+const fetchUserSubscription = async (jwt) => {
+  const response = await fetch(
+    `https://pricely.tech/api/User/isUserPremium?jwt=${jwt}`
+  );
+  return await response.json();
+};
 
 const fetchCategories = async () => {
-  const response = await fetch('https://pricely.tech/api/Category');
+  const response = await fetch("https://pricely.tech/api/Category");
   return await response.json();
-}
+};
 
 function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -35,31 +44,42 @@ function App() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
+  const fetchUserInfo = async (jwt) => {
+    const user = await fetchUser(jwt);
+    const isPremium = await fetchUserPremium(jwt);
+    let subUser = null;
+    if (isPremium) {
+      subUser = await fetchUserSubscription(jwt);
+    }
+
+    setUser({
+      jwt,
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.surname,
+      email: user.email,
+      profilePictureURL:
+        user.pictureLink.slice(0, user.pictureLink.indexOf("s96-c")) + "s256-c",
+      isAdmin: user.isAdmin,
+      isPremium,
+      expireDate: subUser
+        ? new Date(subUser.expireDate)
+        : new Date("2022-05-23T17:53:14.547Z"),
+    });
+  };
+
   const handleLogin = async (resp) => {
     setLoginModalOpen(false);
-
-    fetchUser(resp.credential).then(user => {
-      fetchUserPremium(resp.credential).then(isPremium => {
-        setUser({
-          jwt: resp.credential,
-          id: user.id,
-          firstName: user.firstName,
-          lastName: user.surname,
-          email: user.email,
-          profilePictureURL: user.pictureLink.slice(0, user.pictureLink.indexOf("s96-c")) + "s256-c",
-          isAdmin: user.isAdmin,
-          isPremium
-        });
-        document.cookie = `jwt=${resp.credential}; max-age=3599;`;
-        navigate(`/users/${user.id}/about`);
-      })
-    });
-  }
+    await fetchUser(resp);
+    document.cookie = `jwt=${resp.credential}; max-age=3599;`;
+    navigate(`/users/${user.id}/about`);
+  };
 
   useEffect(() => {
     /* global google */
     google.accounts.id.initialize({
-      client_id: "831759783769-tb5j14bhijihhhv7nkju52325remua8c.apps.googleusercontent.com",
+      client_id:
+        "831759783769-tb5j14bhijihhhv7nkju52325remua8c.apps.googleusercontent.com",
       callback: handleLogin,
     });
 
@@ -72,31 +92,22 @@ function App() {
     }
 
     if (jwt) {
-      fetchUser(jwt).then(user => {
-        fetchUserPremium(jwt).then(isPremium => {
-          setUser({
-            jwt,
-            id: user.id,
-            firstName: user.firstName,
-            lastName: user.surname,
-            email: user.email,
-            profilePictureURL: user.pictureLink.slice(0, user.pictureLink.indexOf("s96-c")) + "s256-c",
-            isAdmin: user.isAdmin,
-            isPremium
-          });
-        })
-      });
+      fetchUserInfo(jwt);
     }
 
-    fetchCategories()
-      .then(setCategories);
-
+    fetchCategories().then(setCategories);
   }, []);
 
   return (
-    <AuthProvider value={{user: user, logout: () => setUser(false)}}>
-      <Header handleSidebarClick={() => setSidebarOpen(true)} setLoginModalOpen={() => setLoginModalOpen(true)} />
-      <Modal open={isLoginModalOpen} onModalClose={() => setLoginModalOpen(false)}>
+    <AuthProvider value={{ user: user, logout: () => setUser(false) }}>
+      <Header
+        handleSidebarClick={() => setSidebarOpen(true)}
+        setLoginModalOpen={() => setLoginModalOpen(true)}
+      />
+      <Modal
+        open={isLoginModalOpen}
+        onModalClose={() => setLoginModalOpen(false)}
+      >
         <ModalAuth />
       </Modal>
       <Sidebar
@@ -109,12 +120,13 @@ function App() {
         maxWidth="xl"
         sx={{
           minHeight: "100vh",
-          my: '48px',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: "center"
-        }}>
+          my: "48px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         <Outlet />
       </Container>
       <Footer />
