@@ -215,12 +215,14 @@ public class UserRepository : IUserRepository
         {
             return null;
         }
-    
-        _db.Orders.Add(new Order
+
+        var createdOrder = new Order
         {
             UserId = user.Id,
             Used = false
-        });
+        };
+    
+        _db.Orders.Add(createdOrder);
         await _db.SaveChangesAsync();
     
         var order = await _db.Orders.OrderBy(x => x.Id).LastOrDefaultAsync(x => x.UserId == user.Id);
