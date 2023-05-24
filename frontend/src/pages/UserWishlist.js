@@ -15,8 +15,8 @@ import { useSearchParams } from "react-router-dom";
 const PER_ROW = 4;
 const ROWS = 2;
 
-const fetchUserFavourites = async (id, offset) => {
-  const response = await fetch(`https://pricely.tech/api/Favourites/getPaginated?userId=${id}&offset=${offset ?? 0}&limit=${PER_ROW * ROWS}`);
+const fetchUserFavourites = async (user, offset) => {
+  const response = await fetch(`https://pricely.tech/api/Favourites/getPaginated?userId=${user.id}&offset=${offset ?? 0}&limit=${PER_ROW * ROWS}`);
   
   if (!response.ok) {
     throw new Error();
@@ -25,7 +25,7 @@ const fetchUserFavourites = async (id, offset) => {
   return await response.json();
 }
 
-const deleteAllFavourites = async (jwt) => {
+const deleteAllFavourites = async (user) => {
   const response = await fetch(
     `https://pricely.tech/api/Favourites/deleteAll`,
     {
@@ -33,7 +33,7 @@ const deleteAllFavourites = async (jwt) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(jwt),
+      body: JSON.stringify(user.jwt),
     }
   );
 
@@ -42,7 +42,6 @@ const deleteAllFavourites = async (jwt) => {
 
 const UserWishlist = (props) => {
   const [favourites, setFavourites] = useState({});
-  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const { user } = useAuthContext();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -51,7 +50,7 @@ const UserWishlist = (props) => {
     if (user) {
       setLoading(true);
       fetchUserFavourites(
-        user.id,
+        user,
         searchParams.get('offset')
       ).then((data) => {
         const actualData = data.result.map((elem) => {
@@ -64,8 +63,12 @@ const UserWishlist = (props) => {
   }, [searchParams]);
 
   const handleFavouritesDelete = () => {
-    deleteAllFavourites(user?.jwt);
-    setFavourites([]);
+    setLoading(true);
+    deleteAllFavourites(user).then((data) => {
+      setFavourites({});
+      setLoading(false);
+    });
+    setSearchParams({});
   };
 
   const handlePageChange = page => {

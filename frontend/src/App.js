@@ -79,8 +79,13 @@ function App() {
     fetchCategories().then(setCategories);
   }, []);
 
+  const logout = () => {
+    document.cookie = `jwt=; max-age=-1;`;
+    setUser(false);
+  }
+
   return (
-    <AuthProvider value={{ user: user, logout: () => setUser(false) }}>
+    <AuthProvider value={{ user: user, logout }}>
       <Header
         handleSidebarClick={() => setSidebarOpen(true)}
         setLoginModalOpen={() => setLoginModalOpen(true)}
