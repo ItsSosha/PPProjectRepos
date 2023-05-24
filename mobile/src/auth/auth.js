@@ -2,10 +2,10 @@ import { useRouter, useSegments } from "expo-router";
 import { useState, useEffect, useContext, createContext, useRef } from "react";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
-import JWT from 'expo-jwt';
+import JWT from "expo-jwt";
 import UserService from "../API/UserService";
-import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
 
 const AuthContext = createContext(null);
 
@@ -36,23 +36,25 @@ export function AuthProvider(props) {
   const notificationListener = useRef();
   const responseListener = useRef();
   const router = useRouter();
-  
 
   const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId: "831759783769-3r713gngbaj289trqp2s5gi14jg3fu90.apps.googleusercontent.com",
-    iosClientId: "831759783769-enuge94e6vvdtmsqjhednlqn4uv9rkhh.apps.googleusercontent.com",
-    webClientId: "831759783769-kk9ctot22okj9rv0l6sl65oeig8t4bt2.apps.googleusercontent.com",
-    expoClientId: "831759783769-kk9ctot22okj9rv0l6sl65oeig8t4bt2.apps.googleusercontent.com"
+    androidClientId:
+      "831759783769-3r713gngbaj289trqp2s5gi14jg3fu90.apps.googleusercontent.com",
+    iosClientId:
+      "831759783769-enuge94e6vvdtmsqjhednlqn4uv9rkhh.apps.googleusercontent.com",
+    webClientId:
+      "831759783769-kk9ctot22okj9rv0l6sl65oeig8t4bt2.apps.googleusercontent.com",
+    expoClientId:
+      "831759783769-kk9ctot22okj9rv0l6sl65oeig8t4bt2.apps.googleusercontent.com",
   });
 
   useEffect(() => {
     if (response?.type === "success") {
       setToken(response.authentication.accessToken);
-      getUserInfo();
+      console.log(response);
+      getUserInfo().then(setUser);
     }
   }, [response, token]);
-
-  
 
   const getUserInfo = async () => {
     try {
@@ -63,46 +65,43 @@ export function AuthProvider(props) {
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Can't fetch user info");
-      }
-
       const googleUser = await response.json();
       const key = "an exceptionally secret key";
       const jwt = JWT.encode(googleUser, key, { algorithm: "HS256" });
 
-      let user = await UserService.get(jwt);
+      let user = await UserService.getUserSubscription(jwt);
 
       const notificationToken = await registerForPushNotificationsAsync();
 
       if (user.notificationToken !== notificationToken) {
-        UserService.setNotificationToken(user.jwt, notificationToken);
+        await UserService.setNotificationToken(user.jwt, notificationToken);
         user = await UserService.get(user.jwt);
       }
 
-      notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-        setNotification(notification);
-      });
-  
-      responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-        const itemId = response.notification.request.content.data.itemId
-        router.replace(`/products/${itemId}`);
-      });
+      notificationListener.current =
+        Notifications.addNotificationReceivedListener((notification) => {
+          setNotification(notification);
+        });
 
-      setUser(user);
+      responseListener.current =
+        Notifications.addNotificationResponseReceivedListener((response) => {
+          const itemId = response.notification.request.content.data.itemId;
+          router.replace(`/products/${itemId}`);
+        });
 
+      return user;
     } catch (error) {
-      console.log(error)
-      setUser(null);
+      return null;
     }
   };
-
 
   useProtectedRoute(user);
 
   useEffect(() => {
     return () => {
-      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(
+        notificationListener.current
+      );
       Notifications.removeNotificationSubscription(responseListener.current);
     };
   }, []);
@@ -123,29 +122,30 @@ export function AuthProvider(props) {
 async function registerForPushNotificationsAsync() {
   let token;
 
-  if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
+  if (Platform.OS === "android") {
+    await Notifications.setNotificationChannelAsync("default", {
+      name: "default",
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#FF231F7C',
+      lightColor: "#FF231F7C",
     });
   }
 
   if (Device.isDevice) {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
+    if (existingStatus !== "granted") {
       const { status } = await Notifications.requestPermissionsAsync();
       finalStatus = status;
     }
-    if (finalStatus !== 'granted') {
-      alert('Failed to get push token for push notification!');
+    if (finalStatus !== "granted") {
+      alert("Failed to get push token for push notification!");
       return;
     }
     token = (await Notifications.getExpoPushTokenAsync()).data;
   } else {
-    alert('Must use physical device for Push Notifications');
+    alert("Must use physical device for Push Notifications");
   }
 
   return token;
@@ -155,8 +155,8 @@ export async function schedulePushNotification() {
   await Notifications.scheduleNotificationAsync({
     content: {
       title: "You've got mail! 📬",
-      body: 'Here is the notification body',
-      data: { data: 'goes here' },
+      body: "Here is the notification body",
+      data: { data: "goes here" },
     },
     trigger: { seconds: 2 },
   });

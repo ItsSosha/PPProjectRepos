@@ -10,16 +10,16 @@ const styles = StyleSheet.create({
     },
     linkButton: {
       background: "none",
-      textDecoration: "underline"
-    }
+      textDecoration: "underline",
+    },
   },
   layout: {
     container: {
       flex: 1,
-      paddingHorizontal: 20
+      paddingHorizontal: 20,
     },
     profileImageContainer: {
-      alignItems: "center"
+      alignItems: "center",
     },
     subscriptionSection: {
       heading: {
@@ -27,111 +27,123 @@ const styles = StyleSheet.create({
       },
       body: {
         marginTop: 10,
-        rowGap: 5
-      }
-    }
+        rowGap: 5,
+      },
+    },
   },
   typography: {
     userInfo: {
       main: {
         marginTop: 20,
         fontSize: 30,
-        fontWeight: 600
+        fontWeight: 600,
       },
       sub: {
         fontSize: 15,
-      }
+      },
     },
     subscriptionSection: {
       heading: {
         fontWeight: 700,
-        fontSize: 30
+        fontSize: 30,
       },
       body: {
         fontSize: 20,
-        lineHeight: 28
+        lineHeight: 28,
       },
       link: {
         fontSize: 20,
         lineHeight: 28,
-        textDecorationLine: "underline"
-      }
-    }
-  }
-})
+        textDecorationLine: "underline",
+      },
+    },
+  },
+});
 
 const user = {
   name: "Shark Fishers",
   email: "shark@ocean.bul",
   isPremium: true,
-  profileImageUrl: "https://lh3.googleusercontent.com/ogw/AOLn63HMIWZpv0of2VYV5NFGSQlWW5BU6GmdSx2OZOnBJA=s256-c-mo"
-}
+  profileImageUrl:
+    "https://lh3.googleusercontent.com/ogw/AOLn63HMIWZpv0of2VYV5NFGSQlWW5BU6GmdSx2OZOnBJA=s256-c-mo",
+};
 
 const Home = (props) => {
   const { user } = useAuth();
 
   return (
     <View style={styles.layout.container}>
-      {(user) ?
+      {user ? (
         <>
           <View style={styles.layout.profileImageContainer}>
             <Image
               source={{
-                uri: user.pictureLink.slice(0, user.pictureLink.indexOf("s96-c")) + "s256-c"
+                uri:
+                  user.pictureLink.slice(0, user.pictureLink.indexOf("s96-c")) +
+                  "s256-c",
               }}
               style={{
                 height: 200,
                 width: 200,
                 borderRadius: 100,
                 marginTop: 30,
-              }} />
+              }}
+            />
           </View>
           <View style={styles.utils.center}>
             <Text style={styles.typography.userInfo.main}>
               {`${user.firstName} ${user.surname}`}
             </Text>
-            <Text style={styles.typography.userInfo.sub}>
-              {user.email}
-            </Text>
+            <Text style={styles.typography.userInfo.sub}>{user.email}</Text>
           </View>
           <View style={styles.layout.subscriptionSection.heading}>
             <Text style={styles.typography.subscriptionSection.heading}>
               Преміум-підписка
             </Text>
-            {(user.isPremium) ?
+            {user.isPremium ? (
               <View style={styles.layout.subscriptionSection.body}>
                 <Text style={styles.typography.subscriptionSection.body}>
-                  Ваша підписка діє з 28.04.2023 до 28.05.2023
+                  Ваша підписка діє до {user.expireDate.toLocaleString()}
                 </Text>
                 <Text style={styles.typography.subscriptionSection.body}>
-                  До сплину підписки 30 днів
+                  До сплину підписки{" "}
+                  {Math.ceil((user.expireDate - Date.now()) / 8.64e7)} днів
                 </Text>
                 <Text
                   style={styles.typography.subscriptionSection.link}
-                  onPress={() => Linking.openURL("https://pricely.tech")}
+                  onPress={() =>
+                    Linking.openURL(
+                      `https://pricely.tech/api/User/pay?jwt=${user.jwt}`
+                    )
+                  }
                 >
-                  Продовжити підписку можна у веб-версії застосунку
+                  Продовжити підписку
                 </Text>
-              </View> :
+              </View>
+            ) : (
               <View>
                 <Text style={styles.typography.subscriptionSection.body}>
                   На даний момент преміум-підписка не активна
                 </Text>
                 <Text
                   style={styles.typography.subscriptionSection.link}
-                  onPress={() => Linking.openURL("https://pricely.tech")}
+                  onPress={() =>
+                    Linking.openURL(
+                      `https://pricely.tech/api/User/pay?jwt=${user.jwt}`
+                    )
+                  }
                 >
-                  Оформити підписку можна у веб-версії застосунку
+                  Перейдіть за посиланням, щоб оформити підписку.
                 </Text>
               </View>
-            }
+            )}
           </View>
-        </> :
-        <Text>
-          Loading...
-        </Text>}
+        </>
+      ) : (
+        <Text>Loading...</Text>
+      )}
     </View>
-  )
+  );
 };
 
 export default Home;
