@@ -1,16 +1,10 @@
-import {
-  Box,
-  Grid,
-  Stack,
-  Typography,
-  Link
-} from "@mui/material";
+import { Box, Grid, Link, Stack, Typography } from "@mui/material";
 import { useAuthContext } from "../auth/auth";
-
 import FormField from "../components/FormField";
 
 const UserAbout = (props) => {
   const { user } = useAuthContext();
+
   return (
     <>
       <Typography variant="h4" fontWeight="700">
@@ -18,20 +12,17 @@ const UserAbout = (props) => {
       </Typography>
       <Grid container mt={4}>
         <Grid item xs={8}>
-          <Stack spacing={2} sx={{
-            maxWidth: "480px"
-          }}>
-            <Typography variant="body1">
-              Ім'я
-            </Typography>
+          <Stack
+            spacing={2}
+            sx={{
+              maxWidth: "480px",
+            }}
+          >
+            <Typography variant="body1">Ім'я</Typography>
             <FormField label={user.firstName} />
-            <Typography variant="body1">
-              Прізвище
-            </Typography>
+            <Typography variant="body1">Прізвище</Typography>
             <FormField label={user.lastName} />
-            <Typography variant="body1">
-              Email
-            </Typography>
+            <Typography variant="body1">Email</Typography>
             <FormField label={user.email} />
           </Stack>
         </Grid>
@@ -48,27 +39,41 @@ const UserAbout = (props) => {
       <Typography variant="h4" fontWeight="700" mt={4}>
         Преміум підписка
       </Typography>
-      {(user.isPremium) ?
+      {user.expireDate > new Date() ? (
         <Stack spacing={0}>
           <Typography variant="body1" fontSize="26px">
-            Ваша підписка діє з 28.04.2023 до 28.05.2023
+            Ваша підписка діє до {user.expireDate.toLocaleString()}
           </Typography>
           <Typography variant="body1" fontSize="26px">
-            До сплину підписки 30 днів
+            До сплину підписки {(user.expireDate - new Date()).toLocaleString()}
           </Typography>
-          <Link href="#" variant="body1" fontSize="26px" color="inherit">
+          <Link
+            href={`https://pricely.tech/api/User/pay?jwt=${user.jwt}`}
+            variant="body1"
+            fontSize="26px"
+            color="inherit"
+            target="_blank"
+          >
             Продовжити підписку
           </Link>
-        </Stack> :
+        </Stack>
+      ) : (
         <Typography variant="body1" fontSize="26px">
-          На даний момент підписка не активна 😞.
-          Щоб отримати доступ до преміального функціоналу,
-          такого як доступ до історії цін на товар,
-          <Link href="#" variant="body1" fontSize="26px" color="inherit">оформіть підписку.</Link>
+          На даний момент підписка не активна 😞. Щоб отримати доступ до
+          преміального функціоналу, такого як доступ до історії цін на товар,
+          <Link
+            href={`https://pricely.tech/api/User/pay?jwt=${user.jwt}`}
+            variant="body1"
+            fontSize="26px"
+            color="inherit"
+            target="_blank"
+          >
+            оформіть підписку.
+          </Link>
         </Typography>
-      }
+      )}
     </>
-  )
+  );
 };
 
 export default UserAbout;
