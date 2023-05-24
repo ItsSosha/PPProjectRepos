@@ -8,27 +8,11 @@ import { AuthProvider } from "./auth/auth";
 import Modal from "./components/Modal/Modal";
 import ModalAuth from "./components/Modal/ModalAuth";
 
-const fetchUser = async (jwt) => {
-  const response = await fetch(`https://pricely.tech/api/User?jwt=${jwt}`);
-
-  if (!response.ok) {
-    throw new Error();
-  }
-
-  return await response.json();
-};
-
-const fetchUserPremium = async (jwt) => {
-  const response = await fetch(
-    `https://pricely.tech/api/User/isUserPremium?jwt=${jwt}`
-  );
-  return await response.json();
-};
-
 const fetchUserSubscription = async (jwt) => {
   const response = await fetch(
-    `https://pricely.tech/api/User/isUserPremium?jwt=${jwt}`
+    `https://pricely.tech/api/User/getSubscription?jwt=${jwt}`
   );
+
   return await response.json();
 };
 
@@ -45,14 +29,10 @@ function App() {
   const [user, setUser] = useState(null);
 
   const fetchUserInfo = async (jwt) => {
-    const user = await fetchUser(jwt);
-    const isPremium = await fetchUserPremium(jwt);
-    let subUser = null;
-    if (isPremium) {
-      subUser = await fetchUserSubscription(jwt);
-    }
+    const subscription = await fetchUserSubscription(jwt);
+    const user = subscription.user;
 
-    setUser({
+    const res = {
       jwt,
       id: user.id,
       firstName: user.firstName,
@@ -61,16 +41,17 @@ function App() {
       profilePictureURL:
         user.pictureLink.slice(0, user.pictureLink.indexOf("s96-c")) + "s256-c",
       isAdmin: user.isAdmin,
-      isPremium,
-      expireDate: subUser
-        ? new Date(subUser.expireDate)
-        : new Date("2022-05-23T17:53:14.547Z"),
-    });
+      expireDate: new Date(subscription.expireDate),
+      isPremium: new Date(subscription.expireDate) > Date.now() ? true : false,
+    };
+
+    return res;
   };
 
   const handleLogin = async (resp) => {
     setLoginModalOpen(false);
-    await fetchUser(resp);
+    const user = await fetchUserInfo(resp.credential);
+    setUser(user);
     document.cookie = `jwt=${resp.credential}; max-age=3599;`;
     navigate(`/users/${user.id}/about`);
   };
@@ -92,7 +73,7 @@ function App() {
     }
 
     if (jwt) {
-      fetchUserInfo(jwt);
+      fetchUserInfo(jwt).then(setUser);
     }
 
     fetchCategories().then(setCategories);

@@ -45,7 +45,8 @@ const UserAbout = (props) => {
             Ваша підписка діє до {user.expireDate.toLocaleString()}
           </Typography>
           <Typography variant="body1" fontSize="26px">
-            До сплину підписки {(user.expireDate - new Date()).toLocaleString()}
+            До сплину підписки{" "}
+            {Math.ceil((user.expireDate - Date.now()) / 8.64e7)} днів
           </Typography>
           <Link
             href={`https://pricely.tech/api/User/pay?jwt=${user.jwt}`}
