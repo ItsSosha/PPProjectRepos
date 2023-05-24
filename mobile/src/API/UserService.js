@@ -42,10 +42,12 @@ export default class UserService {
 
     const subscription = await response.json();
     const user = subscription.user;
-    user.expireDate = new Date(subscription.expireDate);
-    user.isPremium = user.expireDate > Date.now();
-    user.jwt = jwt;
-
-    return user;
+    const subUser = {
+      ...user,
+      expireDate: new Date(subscription.expireDate),
+      isPremium: new Date(subscription.expireDate) > Date.now(),
+      jwt,
+    };
+    return subUser;
   }
 }

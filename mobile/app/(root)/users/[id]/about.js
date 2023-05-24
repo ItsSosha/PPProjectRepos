@@ -70,6 +70,7 @@ const user = {
 
 const Home = (props) => {
   const { user } = useAuth();
+  console.log(user);
 
   return (
     <View style={styles.layout.container}>
