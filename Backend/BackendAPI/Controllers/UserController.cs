@@ -87,7 +87,11 @@ namespace BackendAPI.Controllers
 
             if (sub == null)
             {
-                return NotFound();
+                return Ok(new Subscription()
+                {
+                    User = user,
+                    ExpireDate = DateTime.UnixEpoch
+                });
             }
 
             return Ok(sub);
@@ -107,6 +111,7 @@ namespace BackendAPI.Controllers
         [Route("pay")]
         public async Task<ActionResult> Pay(string jwt)
         {
+            Console.WriteLine("PAY!");
             var user = await _userRepository.GetOrRegisterUser(jwt);
             if (user == null)
             {
@@ -134,7 +139,7 @@ namespace BackendAPI.Controllers
             var liqPayClient = new LiqPayClient(publicKey, privateKey);
             var response = await liqPayClient.RequestAsync("request", invoiceRequest);
 
-            return RedirectPermanent(response.Href);
+            return Redirect(response.Href);
         }
 
         [HttpPost]

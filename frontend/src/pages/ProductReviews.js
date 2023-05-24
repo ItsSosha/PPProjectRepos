@@ -45,7 +45,7 @@ const addReview = async (jwt, id, reviewtext, grade) => {
     throw new Error();
   }
 
-  return await response.json();
+  return response;
 };
 
 const removeReview = async (jwt, reviewId) => {
@@ -64,7 +64,7 @@ const removeReview = async (jwt, reviewId) => {
     throw new Error();
   }
 
-  return await resp.json();
+  return resp;
 };
 
 const ProductReviews = () => {
@@ -107,12 +107,17 @@ const ProductReviews = () => {
 
   const handleReviewDelete = async (jwt, reviewId) => {
     await removeReview(jwt, reviewId);
-    setSearchParams((prevSearchParams) => ({
-      offset:
-        (prevSearchParams.offset - 1) % PER_PAGE === 0
-          ? prevSearchParams.offset - PER_PAGE
-          : prevSearchParams.offset,
-    }));
+
+    const params = new URLSearchParams();
+    params.set('offset', (reviews.total - 1) % PER_PAGE === 0
+    ? searchParams.get('offset') - PER_PAGE
+    : searchParams.get('offset'));
+
+    if ((reviews.total - 1) % PER_PAGE !== 0) {
+      params.set('forceReload', (searchParams.has('forceReload') ? parseInt(searchParams.get('forceReload')) + 1 : 1) % 2);
+    }
+
+    setSearchParams(params);
   };
 
   return (
