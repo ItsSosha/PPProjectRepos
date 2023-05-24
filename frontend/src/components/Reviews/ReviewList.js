@@ -8,9 +8,9 @@ const ReviewList = ({ reviews, handleReviewDelete, user }) => {
           key={review.id}
           review={review}
           handleReviewDelete={
-            review.userId === user.id || user.isAdmin
+            review.userId === user?.id || user?.isAdmin
               ? () => {
-                  handleReviewDelete(user.jwt, review.id);
+                  handleReviewDelete(user?.jwt, review.id);
                 }
               : null
           }

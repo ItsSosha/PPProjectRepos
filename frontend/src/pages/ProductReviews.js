@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import Modal from "../components/Modal/Modal";
 import ModalReview from "../components/Modal/ModalReview";
 import styled from "styled-components";
-import reviews from "../components/Reviews/Reviews";
 import ReviewList from "../components/Reviews/ReviewList";
 import {
   Button,
@@ -169,9 +168,8 @@ const ProductReviews = () => {
 const View = ({ reviews, page, onPageChange, user, handleReviewDelete }) => {
   return (
     <>
-      {reviews.total != 0 ? (
+      {reviews.total !== 0 ? (
         <>
-          {/* <ReviewList reviews={reviews} perPage={PER_PAGE} page={page} /> */}
           <ReviewList
             reviews={reviews.result}
             handleReviewDelete={handleReviewDelete}

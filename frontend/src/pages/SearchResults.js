@@ -38,9 +38,9 @@ const SearchResults = () => {
       categoryName: searchParams.get("categoryName") || null,
       priceFrom: searchParams.get("priceFrom") || "",
       PriceTo: searchParams.get("PriceTo") || "",
-      isOnSale: searchParams.get("isOnSale") || false,
-      isFoxtrot: searchParams.get("isFoxtrot") || false,
-      isRozetka: searchParams.get("isRozetka") || false,
+      isOnSale: searchParams.get("isOnSale") === 'true' || false,
+      isFoxtrot: searchParams.get("isFoxtrot") === 'true' || false,
+      isRozetka: searchParams.get("isRozetka") === 'true' || false,
     });
 
     setLoading(true);
