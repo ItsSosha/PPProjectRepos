@@ -9,17 +9,6 @@ padding: 20px;
 display: flex;
 flex-direction: column;
 `
-const samplePriceHistory = [
-  {date: "2023-05-06", price: 32500},
-  {date: "2023-05-07", price: 33500},
-  {date: "2023-05-08", price: 33500},
-  {date: "2023-05-09", price: 30000},
-  {date: "2023-05-10", price: 30000},
-  {date: "2023-05-11", price: 32500}
-];
-
-const IS_USER_PREMIUM = true;
-
 
 const ProductAbout = () => {
   const { product } = useOutletContext();

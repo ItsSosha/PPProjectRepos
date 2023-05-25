@@ -1,12 +1,11 @@
 import {
   ListItem,
   ListItemButton,
-  ListItemIcon,
   ListItemText
 } from "@mui/material"
 import { Link } from "react-router-dom";
 
-const SidebarItem = ({ icon, text }) => {
+const SidebarItem = ({ text }) => {
   return (
     <ListItem sx={{ py: 0, px: 1 }}>
       <ListItemButton 
@@ -19,11 +18,6 @@ const SidebarItem = ({ icon, text }) => {
           backgroundColor: "rgba(255, 255, 255, 0.1)",
         }
       }}>
-        {/* <ListItemIcon sx={{ 
-          minWidth: "35px",
-        }}>
-          {icon}
-        </ListItemIcon> */}
         <ListItemText primary={text} />
       </ListItemButton>
     </ListItem>

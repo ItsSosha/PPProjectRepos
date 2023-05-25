@@ -1,6 +1,5 @@
 import { useState } from "react";
-// import categories from "../Sidebar/Categories";
-import { Button, FormControl, InputLabel, Select, MenuItem, FormLabel } from "@mui/material";
+import { Button, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import styled from "styled-components";
 
 const Form = styled.form`
@@ -13,8 +12,6 @@ width: 40ch;
 const ModalEditRawCategory = ({onCategoryChange, defaultCategory, categories}) => {
 
     const [selectedCategory, setSelectedCategory] = useState(defaultCategory);
-
-    console.log(categories);
 
     return (
         <Form onSubmit={e => onCategoryChange(e, selectedCategory)}>

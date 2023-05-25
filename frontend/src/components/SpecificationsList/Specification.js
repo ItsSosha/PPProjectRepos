@@ -5,7 +5,7 @@ import { Typography, Box } from "@mui/material"
 const DottedFiller = styled.div`
 position: absolute;
 right: 16px;
-bottom: 8px;
+top: 1em;
 width: 100%;
 border: 1px #221f1f dotted;
 `
