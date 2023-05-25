@@ -46,22 +46,24 @@ export function AuthProvider(props) {
       "831759783769-kk9ctot22okj9rv0l6sl65oeig8t4bt2.apps.googleusercontent.com",
     expoClientId:
       "831759783769-kk9ctot22okj9rv0l6sl65oeig8t4bt2.apps.googleusercontent.com",
+    useProxy: true,
   });
 
   useEffect(() => {
-    if (response?.type === "success") {
+    if (response?.type === "success" && response.authentication.accessToken) {
       setToken(response.authentication.accessToken);
-      console.log(response);
-      getUserInfo().then(setUser);
+      getUserInfo(response.authentication.accessToken).then((user) => {
+        setUser(user);
+      });
     }
   }, [response, token]);
 
-  const getUserInfo = async () => {
+  const getUserInfo = async (accessToken) => {
     try {
       const response = await fetch(
         "https://www.googleapis.com/userinfo/v2/me",
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${accessToken}` },
         }
       );
 
@@ -73,9 +75,13 @@ export function AuthProvider(props) {
 
       const notificationToken = await registerForPushNotificationsAsync();
 
-      if (user.notificationToken !== notificationToken) {
+      if (
+        user.notificationToken &&
+        user.notificationToken !== notificationToken
+      ) {
+        console.log("here");
         await UserService.setNotificationToken(user.jwt, notificationToken);
-        user = await UserService.get(user.jwt);
+        user = await UserService.getUserSubscription(user.jwt);
       }
 
       notificationListener.current =
