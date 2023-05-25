@@ -1,6 +1,5 @@
 import Modal from "../components/Modal/Modal";
 import ModalProductDetails from "../components/Modal/ModalProductDetails";
-import dummyAdminData from "../utils/dummyAdminData";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -51,7 +50,7 @@ const AdminUnapproved = () => {
         setRows(data.result);
         setLoading(false);
       });
-  }, []);
+  }, [user]);
 
   return (
     <div>
@@ -82,7 +81,7 @@ const AdminUnapproved = () => {
                   {row.name}
                 </TableCell>
                 <TableCell align="right">
-                  <img src={row.vendorIcon} style={{ height: "1.5em" }} />
+                  <img src={row.rawCategory.store.iconURL} style={{ height: "1.5em" }} alt="vendor" />
                 </TableCell>
                 <TableCell align="right">
                   <Button

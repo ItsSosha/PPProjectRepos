@@ -36,8 +36,8 @@ const SearchResults = () => {
     setParams({
       searchResult: searchParams.get("searchResult") || null,
       categoryName: searchParams.get("categoryName") || null,
-      priceFrom: searchParams.get("priceFrom") || "",
-      PriceTo: searchParams.get("PriceTo") || "",
+      priceFrom: parseInt(searchParams.get("priceFrom")) || "",
+      PriceTo: parseInt(searchParams.get("PriceTo")) || "",
       isOnSale: searchParams.get("isOnSale") === 'true' || false,
       isFoxtrot: searchParams.get("isFoxtrot") === 'true' || false,
       isRozetka: searchParams.get("isRozetka") === 'true' || false,
@@ -151,30 +151,6 @@ const View = ({ products, page, onPageChange }) => {
             На жаль, жоден продукт не був знайдений за вашим запитом.
         </Typography>
       )}
-      {/* <ProductsList
-        itemsPerRow={4}
-        rows={2}
-        data={products.result}
-        page={page}
-      />
-      <Pagination
-        count={Math.ceil(products.total / (PER_PAGE * PER_ROW))}
-        page={page}
-        onChange={(e, value) => onPageChange(value)}
-        sx={{
-          "& .MuiPagination-ul": {
-            justifyContent: "center",
-          },
-          "& .MuiPaginationItem-root": {
-            fontWeight: "700",
-            fontSize: "1rem",
-          },
-          "& .Mui-selected": {
-            textDecoration: "underline",
-            backgroundColor: "transparent",
-          },
-        }}
-      /> */}
     </Stack>
   );
 };
