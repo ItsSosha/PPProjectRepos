@@ -1,3 +1,4 @@
+using Core;
 using DataLayer;
 using DataLayer.Abstract;
 using DataLayer.Repository;
@@ -18,6 +19,9 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+
+var connectionDb = new ConnectionDb(builder.Configuration.GetConnectionString("DefaultConnection"));
+builder.Services.AddSingleton(connectionDb);
 
 var app = builder.Build();
 
