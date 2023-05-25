@@ -2,6 +2,7 @@ package notifications
 
 import (
 	"GoMicroservices/CoreStructs"
+	"GoMicroservices/genericDb"
 	"errors"
 	"github.com/jmoiron/sqlx"
 	expo "github.com/oliveroneill/exponent-server-sdk-golang/sdk"
@@ -71,6 +72,12 @@ func SendNotifications(db *sqlx.DB, item CoreStructs.Item) {
 		return
 	}
 
+	rawItem, err := genericDb.GetById[CoreStructs.RawItem](db, CoreStructs.RawItemTableName, item.RawItemId)
+	if err != nil {
+		log.Println("Cannot get RawItem from db, continuing...")
+		return
+	}
+
 	for _, user := range users {
 		// Sending mail
 
@@ -78,10 +85,11 @@ func SendNotifications(db *sqlx.DB, item CoreStructs.Item) {
 			mailAuth,
 			"Pricely",
 			[]string{user.Email},
-			[]byte("To: "+user.Email+"\r\n"+
+			[]byte("From: Pricely <anastasiia.shtanova@gmail.com> \r\n"+
+				"To: "+user.Email+"\r\n"+
 				"Subject: Your favourite product is on sale!\r\n"+
 				"\r\n"+
-				"Please, check your https://pricely.tech wishlist."))
+				rawItem.Name+" is on sale. Please, check your https://pricely.tech wishlist."))
 
 		if err != nil {
 			log.Println("Err in sending mail")
@@ -103,10 +111,10 @@ func SendNotifications(db *sqlx.DB, item CoreStructs.Item) {
 		response, err := client.Publish(
 			&expo.PushMessage{
 				To:       []expo.ExponentPushToken{pushToken},
-				Body:     "Tap to see details.",
+				Body:     "Зараз діє знижка на " + rawItem.Name + "! Перевірте список бажаного.",
 				Data:     map[string]string{"itemId": strconv.Itoa(int(item.Id))},
 				Sound:    "default",
-				Title:    "Your favourite product is on sale!",
+				Title:    "Pricely",
 				Priority: expo.DefaultPriority,
 			},
 		)
