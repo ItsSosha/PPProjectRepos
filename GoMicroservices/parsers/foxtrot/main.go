@@ -3,12 +3,14 @@ package main //package foxtrot
 import (
 	"GoMicroservices/CoreStructs"
 	"GoMicroservices/genericDb"
+	"encoding/json"
 	"fmt"
 	"github.com/gocolly/colly/v2"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"hash/crc32"
 	"log"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -207,7 +209,17 @@ func parseHomePage(store CoreStructs.Store, categoriesCollector *colly.Collector
 }
 
 func main() {
-	db := sqlx.MustConnect("postgres", "postgres://doadmin:AVNS_y5YBzYRh_TXY10W9cwL@db-postgresql-fra1-48384-do-user-11887088-0.b.db.ondigitalocean.com:25060/StoreDb")
+	conn, err := os.ReadFile("./connectionString.json")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	var connectionString string
+	if err := json.Unmarshal(conn, &connectionString); err != nil {
+		log.Fatalln(err)
+	}
+
+	db := sqlx.MustConnect("postgres", connectionString)
 	defer db.Close()
 	db.SetMaxOpenConns(10)
 	db.SetMaxIdleConns(4)
@@ -219,7 +231,7 @@ func main() {
 		IconURL: "https://foxtrotgroup.com.ua/brand.aspx?id=2",
 	}
 
-	err := genericDb.Insert(db, CoreStructs.StoreInsertQuery, store)
+	err = genericDb.Insert(db, CoreStructs.StoreInsertQuery, store)
 	if err != nil {
 		log.Fatalln(err)
 	}

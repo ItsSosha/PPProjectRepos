@@ -6,6 +6,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	expo "github.com/oliveroneill/exponent-server-sdk-golang/sdk"
 	"log"
+	"net/smtp"
 	"strconv"
 )
 
@@ -32,14 +33,14 @@ func getUserIdsByItem(db *sqlx.DB, itemId int64) ([]int64, error) {
 	return idsSlice, nil
 }
 
-func getNotificationsTokenFromUserIds(db *sqlx.DB, userIds []int64) []string {
+func getUsersFromUserIds(db *sqlx.DB, userIds []int64) []CoreStructs.User {
 	if err := db.Ping(); err != nil {
 		panic("Connection error!")
 	}
 
 	getString := "SELECT * FROM " + CoreStructs.UserTableName + " where \"Id\"=$1"
 
-	notificationTokens := make([]string, 0, len(userIds))
+	users := make([]CoreStructs.User, 0, len(userIds))
 
 	for _, userId := range userIds {
 		user := CoreStructs.User{}
@@ -49,32 +50,50 @@ func getNotificationsTokenFromUserIds(db *sqlx.DB, userIds []int64) []string {
 
 		}
 
-		notificationTokens = append(notificationTokens, user.NotificationToken)
+		users = append(users, user)
 	}
 
-	return notificationTokens
+	return users
 }
 
 func SendNotifications(db *sqlx.DB, item CoreStructs.Item) {
 	client := expo.NewPushClient(nil)
+	mailAuth := smtp.PlainAuth("", "anastasiia.shtanova@gmail.com", "ncotojtkocgaoqhz", "smtp.gmail.com")
 
 	userIds, err := getUserIdsByItem(db, item.Id)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	notificationTokens := getNotificationsTokenFromUserIds(db, userIds)
-	if notificationTokens == nil {
-		log.Println(errors.New("Empty notification tokens slice"))
+	users := getUsersFromUserIds(db, userIds)
+	if users == nil {
+		log.Println(errors.New("Empty users slice"))
 		return
 	}
 
-	for _, token := range notificationTokens {
-		if token == "" {
+	for _, user := range users {
+		// Sending mail
+
+		err := smtp.SendMail("smtp.gmail.com:587",
+			mailAuth,
+			"Pricely",
+			[]string{user.Email},
+			[]byte("To: "+user.Email+"\r\n"+
+				"Subject: Your favourite product is on sale!\r\n"+
+				"\r\n"+
+				"Please, check your https://pricely.tech wishlist."))
+
+		if err != nil {
+			log.Println("Err in sending mail")
+			log.Println(err)
+		}
+
+		// Sending notification
+		if user.NotificationToken == "" {
 			continue
 		}
 
-		pushToken, err := expo.NewExponentPushToken(token)
+		pushToken, err := expo.NewExponentPushToken(user.NotificationToken)
 		if err != nil {
 			log.Println("Err in checking PushToken")
 			log.Println(err)
