@@ -5,14 +5,16 @@ namespace DataLayer;
 
 public class StoreContext : DbContext
 {
-    public StoreContext()
+    private readonly string _connectionString;
+    
+    public StoreContext(ConnectionDb connectionDb)
     {
-  
+        _connectionString = connectionDb.ConnectionString;
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseNpgsql("User ID=doadmin;Password=AVNS_y5YBzYRh_TXY10W9cwL;Host=db-postgresql-fra1-48384-do-user-11887088-0.b.db.ondigitalocean.com;Port=25060;Database=StoreDb;sslmode=require;Trust Server Certificate=true;");
+        optionsBuilder.UseNpgsql(_connectionString);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

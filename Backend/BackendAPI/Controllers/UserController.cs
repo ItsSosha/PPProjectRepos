@@ -111,7 +111,6 @@ namespace BackendAPI.Controllers
         [Route("pay")]
         public async Task<ActionResult> Pay(string jwt)
         {
-            Console.WriteLine("PAY!");
             var user = await _userRepository.GetOrRegisterUser(jwt);
             if (user == null)
             {
