@@ -66,30 +66,6 @@ namespace BackendAPI.Controllers
             
             return Unauthorized(); // ?? 
         }
-        
-        [HttpPost]
-        [Route("addReview")]
-        public async Task<ActionResult> AddReview([FromBody] string jwt, long id, string reviewText, int rating) 
-        {
-
-            var user = await _userRepository.GetOrRegisterUser(jwt);
-            
-            if (user != null)
-            {
-                Review review = new Review()
-                {
-                    Grade = rating,
-                    ReviewText = reviewText,
-                    ItemId = id, // ??
-                    User = user,
-                };
-                
-                bool isAdded = await _itemRepository.AddReview(review, id);
-            }
-
-            return Unauthorized();
-
-        }
 
         [HttpPost]
         [Route("addToItems")]

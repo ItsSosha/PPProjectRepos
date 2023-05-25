@@ -4,8 +4,6 @@ namespace DataLayer.Abstract;
 
 public interface IItemRepository
 {
-    public Task<bool> AddReview(Review review, long id);
-
     public Task<bool> AddToItems(long rawItemId);
     
     public Task<bool> DeleteItem(long id);

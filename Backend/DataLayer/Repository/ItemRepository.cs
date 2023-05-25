@@ -13,21 +13,6 @@ public class ItemRepository : IItemRepository
         _db = db;
     }
 
-    public async Task<bool> AddReview(Review review, long id)
-    {
-        Item item = await _db.Items.FirstOrDefaultAsync(x => x.Id == id);
-
-        if (item != null)
-        {
-            item.Reviews.Add(review);
-            await _db.SaveChangesAsync();
-
-            return true;
-        }
-
-        return false;
-    }
-
     public async Task<bool> AddToItems(long rawItemId)
     {
         if (_db.Items.All(x => x.RawItemId != rawItemId))
@@ -160,17 +145,9 @@ public class ItemRepository : IItemRepository
             .Where(x => x.RawItemId == item.RawItem.Id)
             .Select(x => x)
             .ToListAsync();
-
-        var reviews = await _db.Reviews
-            .Where(x => x.ItemId == item.Id)
-            .Select(x => x)
-            .ToListAsync();
-
+        
         rawItem.Specifications = specifications;
         item.RawItem = rawItem;
-        item.Reviews = reviews;
-        
-        reviews.ForEach(x => x.Item = null);
 
         return item;
     }
