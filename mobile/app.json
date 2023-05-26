@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "scheme": "com.pricely.mobile",
+    "web": {
+      "bundler": "metro"
+    },
+    "ios": {
+      "bunldeIdentifier": "com.pricely.mobile"
+    },
+    "android": {
+      "package": "com.pricely.mobile"
+    },
+    "name": "mobile",
+    "slug": "mobile",
+    "extra": {
+      "eas": {
+        "projectId": "a043dae5-4c4d-4222-9da4-c46768f41157"
+      }
+    }
+  }
+}
